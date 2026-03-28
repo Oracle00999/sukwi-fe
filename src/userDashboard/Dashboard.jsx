@@ -1,0 +1,928 @@
+// pages/UserDashboard.jsx
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import Cardlogo from "../assets/btcimg.png";
+import {
+  ArrowUpTrayIcon,
+  ArrowDownTrayIcon,
+  ArrowsRightLeftIcon,
+  CheckBadgeIcon,
+  ClockIcon,
+  XCircleIcon,
+  BellIcon,
+  ShieldCheckIcon,
+} from "@heroicons/react/24/outline";
+
+const PRICE_FETCH_INTERVAL = 5 * 60 * 60 * 1000;
+
+const tokenIds = {
+  bitcoin: "bitcoin",
+  ethereum: "ethereum",
+  tether: "tether",
+  "binance-coin": "binancecoin",
+  solana: "solana",
+  dogecoin: "dogecoin",
+  ripple: "ripple",
+  stellar: "stellar",
+  tron: "tron",
+};
+
+const tokenDisplayNames = {
+  bitcoin: "Bitcoin",
+  ethereum: "Ethereum",
+  tether: "Tether",
+  "binance-coin": "Binance Coin",
+  solana: "Solana",
+  dogecoin: "Dogecoin",
+  ripple: "Ripple",
+  stellar: "Stellar",
+  tron: "Tron",
+};
+
+const tokenSymbols = {
+  bitcoin: "BTC",
+  ethereum: "ETH",
+  tether: "USDT",
+  "binance-coin": "BNB",
+  solana: "SOL",
+  dogecoin: "DOGE",
+  ripple: "XRP",
+  stellar: "XLM",
+  tron: "TRX",
+};
+
+// CoinGecko image IDs for API logos
+const tokenCoinGeckoIds = {
+  bitcoin: "bitcoin",
+  ethereum: "ethereum",
+  tether: "tether",
+  "binance-coin": "binancecoin",
+  solana: "solana",
+  dogecoin: "dogecoin",
+  ripple: "ripple",
+  stellar: "stellar",
+  tron: "tron",
+};
+
+const notifications = [
+  { id: 1, message: "Welcome to QFS Ledger!", read: false },
+];
+
+const UserDashboard = () => {
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [tokenPrices, setTokenPrices] = useState({});
+  const [tokenLogos, setTokenLogos] = useState({});
+  const [initialized, setInitialized] = useState(false);
+  const [tokenAmounts, setTokenAmounts] = useState({});
+
+  // ── Fetch coin logos from CoinGecko markets endpoint ──
+  const fetchTokenLogos = async () => {
+    try {
+      const ids = Object.values(tokenCoinGeckoIds).join(",");
+      const res = await fetch(
+        `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${ids}&per_page=20&sparkline=false`,
+      );
+      if (!res.ok) return;
+      const data = await res.json();
+      const logos = {};
+      data.forEach((coin) => {
+        const key = Object.keys(tokenCoinGeckoIds).find(
+          (k) => tokenCoinGeckoIds[k] === coin.id,
+        );
+        if (key) logos[key] = coin.image;
+      });
+      setTokenLogos(logos);
+    } catch (e) {
+      console.error("Logo fetch failed:", e);
+    }
+  };
+
+  const fetchTokenPrices = async (isInitial = false) => {
+    try {
+      const ids = Object.values(tokenIds).join(",");
+      const res = await fetch(
+        `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`,
+      );
+      if (!res.ok) return;
+      const data = await res.json();
+      const prices = {};
+      Object.keys(tokenIds).forEach((key) => {
+        const id = tokenIds[key];
+        if (data[id]) prices[key] = data[id].usd;
+      });
+      setTokenPrices((prev) => {
+        const merged = { ...prev, ...prices };
+        if (isInitial) calculateTokenAmounts(merged);
+        return merged;
+      });
+    } catch (e) {
+      console.error("Price fetch failed:", e);
+    }
+  };
+
+  const calculateTokenAmounts = (prices) => {
+    if (!userData?.wallet?.balances) return;
+    const amounts = {};
+    Object.keys(userData.wallet.balances).forEach((token) => {
+      const usd = userData.wallet.balances[token];
+      const price = prices[token];
+      amounts[token] = price > 0 ? usd / price : 0;
+    });
+    setTokenAmounts(amounts);
+  };
+
+  const fetchUserData = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+      const res = await fetch("https://sukwi-be.onrender.com/api/auth/me", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await res.json();
+      if (res.ok && data.success) setUserData(data.data.user);
+    } catch (e) {
+      console.error("User fetch failed:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+    fetchTokenLogos();
+    const id = setInterval(fetchUserData, 30000);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    if (userData?.wallet?.balances && !initialized) {
+      fetchTokenPrices(true);
+      setInitialized(true);
+    }
+    if (initialized) {
+      const id = setInterval(fetchTokenPrices, PRICE_FETCH_INTERVAL);
+      return () => clearInterval(id);
+    }
+  }, [userData, initialized]);
+
+  const formatCurrency = (v) =>
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(v || 0);
+
+  const formatTokenAmount = (amount, token) => {
+    if (!amount) return "0";
+    const precision = {
+      bitcoin: 6,
+      ethereum: 4,
+      tether: 2,
+      "binance-coin": 4,
+      solana: 2,
+      dogecoin: 0,
+      ripple: 0,
+      stellar: 0,
+      tron: 0,
+    };
+    return parseFloat(amount).toFixed(precision[token] ?? 4);
+  };
+
+  const totalBalance = userData?.wallet?.balances
+    ? Object.values(userData.wallet.balances).reduce((s, v) => s + v, 0)
+    : 0;
+
+  const sortedTokens = userData?.wallet?.balances
+    ? Object.entries(userData.wallet.balances)
+        .map(([token, usdBalance]) => ({
+          token,
+          usdBalance,
+          tokenAmount: formatTokenAmount(tokenAmounts[token] || 0, token),
+          price: tokenPrices[token] || 0,
+        }))
+        .sort((a, b) => b.usdBalance - a.usdBalance)
+    : [];
+
+  const user = userData || {};
+
+  // ── KYC badge ──
+  const KycBadge = ({ status }) => {
+    const cfg = {
+      verified: {
+        icon: CheckBadgeIcon,
+        label: "KYC Verified",
+        color: "#4ADE80",
+        bg: "rgba(74,222,128,0.08)",
+        border: "rgba(74,222,128,0.2)",
+      },
+      pending: {
+        icon: ClockIcon,
+        label: "KYC Pending",
+        color: "#F59E0B",
+        bg: "rgba(245,158,11,0.08)",
+        border: "rgba(245,158,11,0.2)",
+      },
+    }[status] || {
+      icon: XCircleIcon,
+      label: "KYC Required",
+      color: "#EF4444",
+      bg: "rgba(239,68,68,0.08)",
+      border: "rgba(239,68,68,0.2)",
+    };
+    const Icon = cfg.icon;
+    return (
+      <div
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "4px 12px",
+          borderRadius: 999,
+          background: cfg.bg,
+          border: `1px solid ${cfg.border}`,
+        }}
+      >
+        <Icon style={{ width: 14, height: 14, color: cfg.color }} />
+        <span
+          style={{
+            fontSize: 12,
+            fontWeight: 700,
+            color: cfg.color,
+            letterSpacing: "0.05em",
+          }}
+        >
+          {cfg.label}
+        </span>
+      </div>
+    );
+  };
+
+  // ── Loading state ──
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: 320,
+        }}
+      >
+        <div style={{ textAlign: "center" }}>
+          <div
+            style={{
+              position: "relative",
+              width: 56,
+              height: 56,
+              margin: "0 auto 16px",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                borderRadius: "50%",
+                border: "3px solid rgba(201,168,76,0.1)",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                borderRadius: "50%",
+                border: "3px solid transparent",
+                borderTopColor: "#C9A84C",
+                animation: "spin 0.9s linear infinite",
+              }}
+            />
+          </div>
+          <p style={{ fontSize: 13, color: "#3D5A70", fontWeight: 500 }}>
+            Loading your wallet…
+          </p>
+        </div>
+        <style>{`@keyframes spin { to { transform:rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
+  const actionButtons = [
+    { to: "/deposit", icon: ArrowUpTrayIcon, label: "Deposit" },
+    { to: "/withdraw", icon: ArrowDownTrayIcon, label: "Receive" },
+    { to: "/link", icon: ArrowsRightLeftIcon, label: "Link" },
+    { to: "/kyc-verify", icon: ShieldCheckIcon, label: "Verify" },
+  ];
+
+  return (
+    <>
+      {/* ── Hero wallet card ── */}
+      <div
+        style={{
+          position: "relative",
+          borderRadius: 20,
+          overflow: "hidden",
+          marginBottom: 24,
+          border: "1px solid rgba(201,168,76,0.3)",
+          boxShadow:
+            "0 0 60px rgba(201,168,76,0.1), inset 0 1px 0 rgba(201,168,76,0.15)",
+        }}
+      >
+        {/* Background image — full cover */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage: `url(${Cardlogo})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
+
+        {/* Light dark overlay — lets image show through */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(135deg, rgba(4,9,15,0.60) 0%, rgba(12,30,56,0.52) 50%, rgba(7,17,31,0.62) 100%)",
+          }}
+        />
+
+        {/* Top gold hairline */}
+        <div
+          style={{
+            position: "relative",
+            zIndex: 2,
+            height: 1,
+            background:
+              "linear-gradient(90deg, transparent, #C9A84C, #F0C040, #C9A84C, transparent)",
+          }}
+        />
+
+        {/* Subtle hex grid */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            pointerEvents: "none",
+            opacity: 0.05,
+            zIndex: 1,
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpath d='M28 66L0 50V17L28 1L56 17V50Z' fill='none' stroke='%23C9A84C' stroke-width='1'/%3E%3C/svg%3E\")",
+            backgroundSize: "56px 100px",
+          }}
+        />
+
+        <div
+          style={{
+            padding: "1.5rem 1.5rem 1.25rem",
+            position: "relative",
+            zIndex: 2,
+          }}
+        >
+          {/* Top row: KYC + Bell */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: 20,
+            }}
+          >
+            <KycBadge status={userData?.kycStatus} />
+
+            {/* Bell */}
+            <div style={{ position: "relative" }}>
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: "rgba(201,168,76,0.08)",
+                  border: "1px solid rgba(201,168,76,0.2)",
+                  cursor: "pointer",
+                  position: "relative",
+                }}
+              >
+                <BellIcon style={{ width: 17, height: 17, color: "#C9A84C" }} />
+                {notifications.some((n) => !n.read) && (
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: -2,
+                      right: -2,
+                      width: 8,
+                      height: 8,
+                      borderRadius: "50%",
+                      background: "#EF4444",
+                      border: "2px solid #07111F",
+                    }}
+                  />
+                )}
+              </button>
+
+              {showNotifications && (
+                <div
+                  style={{
+                    position: "absolute",
+                    right: 0,
+                    top: 44,
+                    width: 280,
+                    borderRadius: 16,
+                    background: "#0C1E38",
+                    border: "1px solid rgba(201,168,76,0.2)",
+                    boxShadow: "0 16px 40px rgba(0,0,0,0.5)",
+                    zIndex: 50,
+                    overflow: "hidden",
+                  }}
+                >
+                  <div
+                    style={{
+                      height: 1,
+                      background:
+                        "linear-gradient(90deg, transparent, #C9A84C, transparent)",
+                    }}
+                  />
+                  <div
+                    style={{
+                      padding: "12px 16px",
+                      borderBottom: "1px solid rgba(201,168,76,0.08)",
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: "white",
+                        margin: 0,
+                      }}
+                    >
+                      Notifications
+                    </p>
+                    <p
+                      style={{
+                        fontSize: 11,
+                        color: "#3D5A70",
+                        margin: "2px 0 0",
+                      }}
+                    >
+                      1 new message
+                    </p>
+                  </div>
+                  <div style={{ padding: 12 }}>
+                    {notifications.map((n) => (
+                      <div
+                        key={n.id}
+                        style={{
+                          padding: "10px 12px",
+                          borderRadius: 10,
+                          background: "rgba(201,168,76,0.05)",
+                          border: "1px solid rgba(201,168,76,0.1)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <p
+                          style={{ fontSize: 13, color: "#C5CDD6", margin: 0 }}
+                        >
+                          {n.message}
+                        </p>
+                        {!n.read && (
+                          <span
+                            style={{
+                              width: 7,
+                              height: 7,
+                              borderRadius: "50%",
+                              background: "#4ADE80",
+                              flexShrink: 0,
+                            }}
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <div
+                    style={{
+                      padding: "10px 16px",
+                      borderTop: "1px solid rgba(201,168,76,0.08)",
+                    }}
+                  >
+                    <button
+                      onClick={() => setShowNotifications(false)}
+                      style={{
+                        width: "100%",
+                        fontSize: 12,
+                        color: "#3D5A70",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        fontWeight: 600,
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.color = "#C9A84C")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.color = "#3D5A70")
+                      }
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Balance */}
+          <div style={{ marginBottom: 24 }}>
+            <p
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                color: "#3D5A70",
+                textTransform: "uppercase",
+                letterSpacing: "0.15em",
+                marginBottom: 6,
+              }}
+            >
+              Total Portfolio Balance
+            </p>
+            <p
+              style={{
+                fontSize: "clamp(2rem,6vw,2.8rem)",
+                fontWeight: 900,
+                color: "white",
+                letterSpacing: "-0.03em",
+                margin: "0 0 4px",
+                lineHeight: 1,
+              }}
+            >
+              {formatCurrency(totalBalance)}
+            </p>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                marginTop: 6,
+              }}
+            >
+              <span
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: "50%",
+                  background: "#C9A84C",
+                  animation: "pulse 2s infinite",
+                }}
+              />
+              <span
+                style={{
+                  fontSize: 11,
+                  color: "#C9A84C",
+                  fontWeight: 600,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                }}
+              >
+                Quantum-Secured · Live
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Action buttons (outside card) ── */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(4,1fr)",
+          gap: 8,
+          marginBottom: 24,
+        }}
+      >
+        {actionButtons.map(({ to, icon: Icon, label }) => (
+          <Link
+            key={label}
+            to={to}
+            style={{ textDecoration: "none" }}
+            onMouseEnter={(e) => {
+              e.currentTarget.querySelector(".ab-wrap").style.borderColor =
+                "rgba(201,168,76,0.4)";
+              e.currentTarget.querySelector(".ab-wrap").style.background =
+                "rgba(201,168,76,0.08)";
+              e.currentTarget.querySelector(".ab-wrap").style.boxShadow =
+                "0 4px 16px rgba(201,168,76,0.1)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.querySelector(".ab-wrap").style.borderColor =
+                "rgba(201,168,76,0.2)";
+              e.currentTarget.querySelector(".ab-wrap").style.background =
+                "rgba(201,168,76,0.04)";
+              e.currentTarget.querySelector(".ab-wrap").style.boxShadow =
+                "none";
+            }}
+          >
+            <div
+              className="ab-wrap"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "16px 12px",
+                borderRadius: 14,
+                background: "rgba(201,168,76,0.04)",
+                border: "1px solid rgba(201,168,76,0.2)",
+                transition: "all 0.2s",
+                gap: 8,
+              }}
+            >
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 10,
+                  background: "rgba(201,168,76,0.08)",
+                  border: "1px solid rgba(201,168,76,0.25)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Icon style={{ width: 18, height: 18, color: "#C9A84C" }} />
+              </div>
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "#8EB1CE",
+                  textAlign: "center",
+                }}
+              >
+                {label}
+              </span>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      {/* ── Assets section ── */}
+      <div
+        style={{
+          borderRadius: 20,
+          overflow: "hidden",
+          background: "linear-gradient(160deg, #0C1C36 0%, #070F1C 100%)",
+          border: "1px solid rgba(201,168,76,0.12)",
+          marginBottom: 24,
+        }}
+      >
+        {/* Top hairline */}
+        <div
+          style={{
+            height: 1,
+            background:
+              "linear-gradient(90deg, transparent, rgba(201,168,76,0.4), transparent)",
+          }}
+        />
+
+        {/* Header */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "1rem 1.25rem",
+            borderBottom: "1px solid rgba(201,168,76,0.07)",
+          }}
+        >
+          <div>
+            <p
+              style={{
+                fontSize: 14,
+                fontWeight: 700,
+                color: "white",
+                margin: 0,
+              }}
+            >
+              Your Assets
+            </p>
+            <p style={{ fontSize: 11, color: "#3D5A70", margin: "2px 0 0" }}>
+              {sortedTokens.length} tokens
+            </p>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: "#C9A84C",
+              }}
+            />
+            <span
+              style={{
+                fontSize: 10,
+                color: "#3D5A70",
+                fontWeight: 600,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+              }}
+            >
+              Live prices
+            </span>
+          </div>
+        </div>
+
+        {/* Token list */}
+        <div style={{ padding: "0.75rem" }}>
+          {sortedTokens.map(({ token, usdBalance, tokenAmount, price }) => (
+            <div
+              key={token}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "12px 14px",
+                borderRadius: 14,
+                marginBottom: 6,
+                border: "1px solid rgba(201,168,76,0.05)",
+                background: "rgba(201,168,76,0.015)",
+                transition: "all 0.2s",
+                cursor: "default",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(201,168,76,0.05)";
+                e.currentTarget.style.borderColor = "rgba(201,168,76,0.18)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(201,168,76,0.015)";
+                e.currentTarget.style.borderColor = "rgba(201,168,76,0.05)";
+              }}
+            >
+              {/* Left: Logo + name */}
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    border: "1px solid rgba(201,168,76,0.15)",
+                    overflow: "hidden",
+                    background: "#04090F",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  {tokenLogos[token] ? (
+                    <img
+                      src={tokenLogos[token]}
+                      alt={token}
+                      style={{ width: 32, height: 32, objectFit: "contain" }}
+                    />
+                  ) : (
+                    <span
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 800,
+                        color: "#C9A84C",
+                      }}
+                    >
+                      {tokenSymbols[token]?.[0]}
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <p
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: "white",
+                      margin: 0,
+                    }}
+                  >
+                    {tokenDisplayNames[token]}
+                  </p>
+                  <p
+                    style={{
+                      fontSize: 11,
+                      color: "#3D5A70",
+                      margin: "2px 0 0",
+                      tabularNums: true,
+                    }}
+                  >
+                    {tokenAmount}{" "}
+                    <span style={{ color: "#2E4A60" }}>
+                      {tokenSymbols[token]}
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Right: Values */}
+              <div style={{ textAlign: "right" }}>
+                <p
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 700,
+                    color: "white",
+                    margin: 0,
+                    fontVariantNumeric: "tabular-nums",
+                  }}
+                >
+                  {formatCurrency(usdBalance)}
+                </p>
+                <p
+                  style={{
+                    fontSize: 11,
+                    color: "#3D5A70",
+                    margin: "2px 0 0",
+                    fontVariantNumeric: "tabular-nums",
+                  }}
+                >
+                  {price > 0 ? formatCurrency(price) : "—"}
+                </p>
+                <div
+                  style={{
+                    display: "inline-block",
+                    marginTop: 4,
+                    padding: "2px 8px",
+                    borderRadius: 999,
+                    background:
+                      usdBalance > 0
+                        ? "rgba(74,222,128,0.08)"
+                        : "rgba(201,168,76,0.05)",
+                    border: `1px solid ${usdBalance > 0 ? "rgba(74,222,128,0.2)" : "rgba(201,168,76,0.08)"}`,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      color: usdBalance > 0 ? "#4ADE80" : "#2E4A60",
+                    }}
+                  >
+                    {usdBalance > 0 ? "Active" : "Empty"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Security info banner ── */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 12,
+          padding: "14px 16px",
+          borderRadius: 14,
+          marginBottom: 80,
+          background: "rgba(201,168,76,0.04)",
+          border: "1px solid rgba(201,168,76,0.1)",
+        }}
+      >
+        <ShieldCheckIcon
+          style={{
+            width: 18,
+            height: 18,
+            color: "#C9A84C",
+            flexShrink: 0,
+            marginTop: 1,
+          }}
+        />
+        <p
+          style={{ fontSize: 12, color: "#3D5A70", margin: 0, lineHeight: 1.6 }}
+        >
+          All assets are protected by quantum-resistant encryption and FRA fund
+          recovery system. Prices update every 5 hours.
+        </p>
+      </div>
+
+      <style>{`
+        @keyframes spin  { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+      `}</style>
+    </>
+  );
+};
+
+export default UserDashboard;
