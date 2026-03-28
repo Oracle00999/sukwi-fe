@@ -6,8 +6,81 @@ import {
   MapPinIcon,
   ShieldCheckIcon,
 } from "@heroicons/react/24/outline";
-import logoImage from "../assets/logo.png";
 import { motion } from "framer-motion";
+
+// ── Same QFS logo used across the site ──
+const QFSLogo = ({ size = 40 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 60 60"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <defs>
+      <linearGradient
+        id="ftBorder"
+        x1="0"
+        y1="0"
+        x2="60"
+        y2="60"
+        gradientUnits="userSpaceOnUse"
+      >
+        <stop offset="0%" stopColor="#C9A84C" />
+        <stop offset="100%" stopColor="#F0C040" />
+      </linearGradient>
+      <linearGradient id="ftChip" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stopColor="#F0C040" />
+        <stop offset="100%" stopColor="#C9A84C" />
+      </linearGradient>
+    </defs>
+    <rect
+      x="1.5"
+      y="1.5"
+      width="57"
+      height="57"
+      rx="14"
+      fill="#07111F"
+      stroke="url(#ftBorder)"
+      strokeWidth="1.5"
+    />
+    <rect
+      x="5"
+      y="5"
+      width="50"
+      height="50"
+      rx="11"
+      fill="none"
+      stroke="rgba(201,168,76,0.08)"
+      strokeWidth="0.75"
+    />
+    <text
+      x="25"
+      y="43"
+      fontSize="38"
+      fontWeight="900"
+      fontFamily="system-ui,-apple-system,sans-serif"
+      fill="#F0C040"
+      textAnchor="middle"
+      letterSpacing="-1"
+    >
+      Q
+    </text>
+    <rect x="35" y="36" width="19" height="15" rx="4" fill="url(#ftChip)" />
+    <text
+      x="44.5"
+      y="47"
+      fontSize="9"
+      fontWeight="800"
+      fontFamily="system-ui,-apple-system,sans-serif"
+      fill="#07111F"
+      textAnchor="middle"
+      letterSpacing="0.5"
+    >
+      FS
+    </text>
+  </svg>
+);
 
 const quickLinks = ["Home", "About QFS", "Fund Security", "Crypto Markets"];
 const resources = ["Documentation", "FRA Guide", "ISO 20022"];
@@ -38,7 +111,7 @@ const Footer = () => {
         }}
       />
 
-      {/* Subtle radial glow top-left behind logo */}
+      {/* Subtle radial glow top-left */}
       <div
         className="absolute top-0 left-0 w-[400px] h-[400px] pointer-events-none"
         style={{
@@ -64,25 +137,25 @@ const Footer = () => {
               transition={{ type: "spring", stiffness: 300 }}
               className="flex items-center gap-3"
             >
-              <img
-                src={logoImage}
-                alt="Web3Global Ledger Logo"
-                className="h-11 w-auto"
-                onError={(e) => {
-                  e.target.style.display = "none";
-                  e.target.parentElement.innerHTML = `
-                    <div class="h-11 w-11 rounded-xl flex items-center justify-center font-bold text-lg"
-                         style="background:linear-gradient(135deg,#C9A84C,#F0C040);color:#060F1E">W3</div>
-                  `;
-                }}
-              />
-              <div className="flex flex-col">
-                <span className="text-lg font-bold text-white leading-none">
-                  Web3Global
+              <div
+                style={{ filter: "drop-shadow(0 0 8px rgba(201,168,76,0.25))" }}
+              >
+                <QFSLogo size={40} />
+              </div>
+              <div className="flex flex-col leading-none">
+                <span
+                  className="font-black text-white"
+                  style={{ fontSize: "1.05rem", letterSpacing: "-0.02em" }}
+                >
+                  QFS
                 </span>
                 <span
-                  className="text-sm font-medium mt-0.5"
-                  style={{ color: "#C9A84C" }}
+                  className="font-semibold uppercase mt-0.5"
+                  style={{
+                    fontSize: "0.6rem",
+                    letterSpacing: "0.2em",
+                    color: "#C9A84C",
+                  }}
                 >
                   Ledger
                 </span>
@@ -236,7 +309,7 @@ const Footer = () => {
           style={{ borderBottom: "1px solid rgba(201,168,76,0.06)" }}
         >
           <span className="text-xs tabular-nums" style={{ color: "#243547" }}>
-            © {new Date().getFullYear()} Web3Global Ledger. All rights reserved.
+            © {new Date().getFullYear()} QFS Ledger. All rights reserved.
           </span>
 
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
@@ -267,9 +340,8 @@ const Footer = () => {
             className="text-xs leading-relaxed max-w-2xl mx-auto"
             style={{ color: "#1E3347" }}
           >
-            Web3Global Ledger delivers quantum-resistant financial
-            infrastructure with FRA protection for fund security during monetary
-            transitions.
+            QFS Ledger delivers quantum-resistant financial infrastructure with
+            FRA protection for fund security during monetary transitions.
           </p>
         </motion.div>
       </div>
