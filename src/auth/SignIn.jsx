@@ -164,7 +164,7 @@ const Login = () => {
 
   return (
     <div style={{ minHeight: "100vh", background: "#04090F" }}>
-      <Navbar />
+      {/* <Navbar /> */}
 
       <div style={{ paddingTop: 96, paddingBottom: 64 }}>
         <div style={{ maxWidth: 440, margin: "0 auto", padding: "0 1rem" }}>

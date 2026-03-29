@@ -14,10 +14,9 @@ import {
   GlobeAltIcon,
   ExclamationCircleIcon,
 } from "@heroicons/react/24/outline";
-import Navbar from "../components/Navbar";
+// import Navbar from "../components/Navbar"; // ← commented out to fix input blocking
 
-// ── Same QFS logo as Navbar ──
-const QFSLogo = ({ size = 56 }) => (
+const QFSLogo = ({ size = 60 }) => (
   <svg
     width={size}
     height={size}
@@ -162,21 +161,6 @@ const countries = [
   "Other",
 ];
 
-// ── Shared input style helpers ──
-const baseInput = {
-  width: "100%",
-  padding: "0.75rem 1rem 0.75rem 2.75rem",
-  background: "#04090F",
-  border: "1px solid rgba(201,168,76,0.15)",
-  borderRadius: 12,
-  color: "white",
-  fontSize: 14,
-  outline: "none",
-  transition: "border-color 0.2s",
-};
-const errorInput = { ...baseInput, borderColor: "rgba(239,68,68,0.5)" };
-const focusStyle = { borderColor: "rgba(201,168,76,0.55)" };
-
 const Signup = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -200,7 +184,7 @@ const Signup = () => {
     country: "",
   });
 
-  const calculatePasswordStrength = (p) => {
+  const calcStrength = (p) => {
     let s = 0;
     if (p.length >= 8) s += 25;
     if (/[A-Z]/.test(p)) s += 25;
@@ -208,24 +192,21 @@ const Signup = () => {
     if (/[^A-Za-z0-9]/.test(p)) s += 25;
     return Math.min(s, 100);
   };
+  const passwordStrength = calcStrength(formData.password);
+  const strengthColor = (s) =>
+    s < 25 ? "#EF4444" : s < 50 ? "#F59E0B" : s < 75 ? "#C9A84C" : "#4ADE80";
+  const strengthText = (s) =>
+    s < 25
+      ? "Very weak"
+      : s < 50
+        ? "Weak"
+        : s < 75
+          ? "Fair"
+          : s < 100
+            ? "Strong"
+            : "Very strong";
 
-  const passwordStrength = calculatePasswordStrength(formData.password);
-
-  const getStrengthColor = (s) => {
-    if (s < 25) return "#EF4444";
-    if (s < 50) return "#F59E0B";
-    if (s < 75) return "#C9A84C";
-    return "#4ADE80";
-  };
-  const getStrengthText = (s) => {
-    if (s < 25) return "Very weak";
-    if (s < 50) return "Weak";
-    if (s < 75) return "Fair";
-    if (s < 100) return "Strong";
-    return "Very strong";
-  };
-
-  const validateForm = () => {
+  const validate = () => {
     const e = {
       email: "",
       password: "",
@@ -277,7 +258,7 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) {
+    if (!validate()) {
       setNotification({
         type: "error",
         message: "Please fill all required fields correctly",
@@ -326,6 +307,15 @@ const Signup = () => {
     }
   };
 
+  const isFormValid = () =>
+    formData.firstName.trim() &&
+    formData.lastName.trim() &&
+    formData.email.trim() &&
+    formData.phone.trim() &&
+    formData.country &&
+    formData.password.length >= 8 &&
+    passwordStrength >= 50;
+
   const passwordRequirements = [
     { label: "At least 8 characters", met: formData.password.length >= 8 },
     {
@@ -339,101 +329,127 @@ const Signup = () => {
     },
   ];
 
-  const isFormValid = () =>
-    formData.firstName.trim() &&
-    formData.lastName.trim() &&
-    formData.email.trim() &&
-    formData.phone.trim() &&
-    formData.country &&
-    formData.password.length >= 8 &&
-    passwordStrength >= 50;
+  // Shared input styles
+  const inp = (name) => ({
+    width: "100%",
+    boxSizing: "border-box",
+    padding: "11px 16px 11px 40px",
+    background: "#04090F",
+    border: `1px solid ${errors[name] ? "rgba(239,68,68,0.5)" : focused[name] ? "rgba(201,168,76,0.55)" : "rgba(201,168,76,0.15)"}`,
+    borderRadius: 12,
+    color: "white",
+    fontSize: 14,
+    outline: "none",
+    display: "block",
+    position: "relative",
+    zIndex: 1,
+  });
 
-  // ── Field renderer ──
-  const Field = ({
-    name,
-    label,
-    type = "text",
-    placeholder,
-    icon: Icon,
-    hint,
-  }) => {
-    const hasError = !!errors[name];
-    const isFocused = focused[name];
-    return (
-      <div>
-        <label
-          style={{
-            display: "block",
-            fontSize: 12,
-            fontWeight: 600,
-            color: "#4A6E8A",
-            textTransform: "uppercase",
-            letterSpacing: "0.1em",
-            marginBottom: 6,
-          }}
-        >
-          {label}
-        </label>
-        <div style={{ position: "relative" }}>
-          <div
-            style={{
-              position: "absolute",
-              left: 12,
-              top: "50%",
-              transform: "translateY(-50%)",
-              pointerEvents: "none",
-            }}
-          >
-            <Icon
-              style={{
-                width: 16,
-                height: 16,
-                color: hasError ? "#EF4444" : isFocused ? "#C9A84C" : "#2E4A60",
-              }}
-            />
-          </div>
-          <input
-            name={name}
-            type={type}
-            required
-            value={formData[name]}
-            onChange={handleChange}
-            onFocus={() => setFocused((p) => ({ ...p, [name]: true }))}
-            onBlur={() => setFocused((p) => ({ ...p, [name]: false }))}
-            placeholder={placeholder}
-            style={{
-              ...(hasError ? errorInput : baseInput),
-              ...(isFocused && !hasError ? focusStyle : {}),
-            }}
-          />
-        </div>
-        {hasError && (
-          <p
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 4,
-              fontSize: 11,
-              color: "#EF4444",
-              marginTop: 4,
-            }}
-          >
-            <ExclamationCircleIcon style={{ width: 12, height: 12 }} />
-            {errors[name]}
-          </p>
-        )}
-        {hint && !hasError && (
-          <p style={{ fontSize: 11, color: "#2E4A60", marginTop: 4 }}>{hint}</p>
-        )}
-      </div>
-    );
-  };
+  const iconColor = (name) =>
+    errors[name] ? "#EF4444" : focused[name] ? "#C9A84C" : "#2E4A60";
+
+  const Label = ({ children }) => (
+    <label
+      style={{
+        display: "block",
+        fontSize: 12,
+        fontWeight: 600,
+        color: "#4A6E8A",
+        textTransform: "uppercase",
+        letterSpacing: "0.1em",
+        marginBottom: 6,
+      }}
+    >
+      {children}
+    </label>
+  );
+
+  const FieldError = ({ name }) =>
+    errors[name] ? (
+      <p
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 4,
+          fontSize: 11,
+          color: "#EF4444",
+          margin: "4px 0 0",
+        }}
+      >
+        <ExclamationCircleIcon
+          style={{ width: 12, height: 12, flexShrink: 0 }}
+        />
+        {errors[name]}
+      </p>
+    ) : null;
+
+  const IconWrap = ({ name, children }) => (
+    <div
+      style={{
+        position: "absolute",
+        left: 12,
+        top: "50%",
+        transform: "translateY(-50%)",
+        pointerEvents: "none",
+        zIndex: 2,
+      }}
+    >
+      {React.cloneElement(children, {
+        style: { width: 16, height: 16, color: iconColor(name) },
+      })}
+    </div>
+  );
 
   return (
-    <div style={{ minHeight: "100vh", background: "#04090F" }}>
-      <Navbar />
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#04090F",
+        position: "relative",
+      }}
+    >
+      {/* <Navbar /> */}
 
-      <div style={{ paddingTop: 96, paddingBottom: 64 }}>
+      {/* Minimal top bar in place of Navbar */}
+      <div
+        style={{
+          height: 64,
+          display: "flex",
+          alignItems: "center",
+          paddingLeft: "1.5rem",
+          borderBottom: "1px solid rgba(201,168,76,0.08)",
+          background: "rgba(4,9,15,0.96)",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <QFSLogo size={32} />
+          <div style={{ lineHeight: 1 }}>
+            <div
+              style={{
+                fontSize: "0.95rem",
+                fontWeight: 900,
+                color: "white",
+                letterSpacing: "-0.02em",
+              }}
+            >
+              QFS
+            </div>
+            <div
+              style={{
+                fontSize: "0.55rem",
+                fontWeight: 600,
+                color: "#C9A84C",
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+              }}
+            >
+              Ledger
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ paddingTop: 40, paddingBottom: 64 }}>
         <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 1rem" }}>
           {/* Back link */}
           <Link
@@ -446,7 +462,7 @@ const Signup = () => {
               fontSize: 13,
               fontWeight: 500,
               textDecoration: "none",
-              marginBottom: 32,
+              marginBottom: 28,
               transition: "color 0.2s",
             }}
             onMouseEnter={(e) => (e.currentTarget.style.color = "#C9A84C")}
@@ -463,7 +479,9 @@ const Signup = () => {
                 justifyContent: "center",
               }}
             >
-              <ArrowLeftIcon style={{ width: 13, height: 13 }} />
+              <ArrowLeftIcon
+                style={{ width: 13, height: 13, color: "#3D5A70" }}
+              />
             </div>
             Back to Home
           </Link>
@@ -478,7 +496,6 @@ const Signup = () => {
               boxShadow: "0 0 60px rgba(201,168,76,0.06)",
             }}
           >
-            {/* Top gold hairline */}
             <div
               style={{
                 height: 1,
@@ -487,14 +504,14 @@ const Signup = () => {
               }}
             />
 
-            <div style={{ padding: "2rem 2rem 2.5rem" }}>
+            <div style={{ padding: "2rem" }}>
               {/* Logo + header */}
-              <div style={{ textAlign: "center", marginBottom: 32 }}>
+              <div style={{ textAlign: "center", marginBottom: 28 }}>
                 <div
                   style={{
                     display: "flex",
                     justifyContent: "center",
-                    marginBottom: 16,
+                    marginBottom: 14,
                   }}
                 >
                   <div
@@ -502,15 +519,15 @@ const Signup = () => {
                       filter: "drop-shadow(0 0 16px rgba(201,168,76,0.3))",
                     }}
                   >
-                    <QFSLogo size={60} />
+                    <QFSLogo size={56} />
                   </div>
                 </div>
                 <h2
                   style={{
-                    fontSize: 22,
+                    fontSize: 21,
                     fontWeight: 800,
                     color: "white",
-                    margin: "0 0 6px",
+                    margin: "0 0 5px",
                     letterSpacing: "-0.02em",
                   }}
                 >
@@ -528,9 +545,9 @@ const Signup = () => {
                     display: "flex",
                     alignItems: "center",
                     gap: 10,
-                    padding: "12px 14px",
+                    padding: "11px 14px",
                     borderRadius: 12,
-                    marginBottom: 24,
+                    marginBottom: 20,
                     background:
                       notification.type === "success"
                         ? "rgba(74,222,128,0.06)"
@@ -554,11 +571,12 @@ const Signup = () => {
                 </div>
               )}
 
+              {/* Form */}
               <form
                 onSubmit={handleSubmit}
-                style={{ display: "flex", flexDirection: "column", gap: 20 }}
+                style={{ display: "flex", flexDirection: "column", gap: 16 }}
               >
-                {/* Name row */}
+                {/* First + Last name */}
                 <div
                   style={{
                     display: "grid",
@@ -566,52 +584,115 @@ const Signup = () => {
                     gap: 12,
                   }}
                 >
-                  <Field
-                    name="firstName"
-                    label="First name"
-                    placeholder="John"
-                    icon={UserIcon}
-                  />
-                  <Field
-                    name="lastName"
-                    label="Last name"
-                    placeholder="Doe"
-                    icon={UserIcon}
-                  />
+                  {/* First name */}
+                  <div>
+                    <Label>First name</Label>
+                    <div style={{ position: "relative" }}>
+                      <IconWrap name="firstName">
+                        <UserIcon />
+                      </IconWrap>
+                      <input
+                        name="firstName"
+                        type="text"
+                        required
+                        value={formData.firstName}
+                        onChange={handleChange}
+                        onFocus={() =>
+                          setFocused((p) => ({ ...p, firstName: true }))
+                        }
+                        onBlur={() =>
+                          setFocused((p) => ({ ...p, firstName: false }))
+                        }
+                        placeholder="John"
+                        style={inp("firstName")}
+                      />
+                    </div>
+                    <FieldError name="firstName" />
+                  </div>
+
+                  {/* Last name */}
+                  <div>
+                    <Label>Last name</Label>
+                    <div style={{ position: "relative" }}>
+                      <IconWrap name="lastName">
+                        <UserIcon />
+                      </IconWrap>
+                      <input
+                        name="lastName"
+                        type="text"
+                        required
+                        value={formData.lastName}
+                        onChange={handleChange}
+                        onFocus={() =>
+                          setFocused((p) => ({ ...p, lastName: true }))
+                        }
+                        onBlur={() =>
+                          setFocused((p) => ({ ...p, lastName: false }))
+                        }
+                        placeholder="Doe"
+                        style={inp("lastName")}
+                      />
+                    </div>
+                    <FieldError name="lastName" />
+                  </div>
                 </div>
 
-                <Field
-                  name="email"
-                  label="Email address"
-                  type="email"
-                  placeholder="you@example.com"
-                  icon={EnvelopeIcon}
-                />
-
-                <Field
-                  name="phone"
-                  label="Phone number"
-                  type="tel"
-                  placeholder="+1 (555) 123-4567"
-                  icon={PhoneIcon}
-                  hint="Include country code for international numbers"
-                />
-
-                {/* Country select */}
+                {/* Email */}
                 <div>
-                  <label
+                  <Label>Email address</Label>
+                  <div style={{ position: "relative" }}>
+                    <IconWrap name="email">
+                      <EnvelopeIcon />
+                    </IconWrap>
+                    <input
+                      name="email"
+                      type="email"
+                      required
+                      value={formData.email}
+                      onChange={handleChange}
+                      onFocus={() => setFocused((p) => ({ ...p, email: true }))}
+                      onBlur={() => setFocused((p) => ({ ...p, email: false }))}
+                      placeholder="you@example.com"
+                      style={inp("email")}
+                    />
+                  </div>
+                  <FieldError name="email" />
+                </div>
+
+                {/* Phone */}
+                <div>
+                  <Label>Phone number</Label>
+                  <div style={{ position: "relative" }}>
+                    <IconWrap name="phone">
+                      <PhoneIcon />
+                    </IconWrap>
+                    <input
+                      name="phone"
+                      type="tel"
+                      required
+                      value={formData.phone}
+                      onChange={handleChange}
+                      onFocus={() => setFocused((p) => ({ ...p, phone: true }))}
+                      onBlur={() => setFocused((p) => ({ ...p, phone: false }))}
+                      placeholder="+1 (555) 123-4567"
+                      style={inp("phone")}
+                    />
+                  </div>
+                  <FieldError name="phone" />
+                  <p
                     style={{
-                      display: "block",
-                      fontSize: 12,
-                      fontWeight: 600,
-                      color: "#4A6E8A",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.1em",
-                      marginBottom: 6,
+                      fontSize: 11,
+                      color: "#2E4A60",
+                      margin: "4px 0 0",
                     }}
                   >
-                    Country
-                  </label>
+                    Include country code for international numbers
+                  </p>
+                </div>
+
+                {/* Country */}
+                <div>
+                  <Label>Country</Label>
                   <div style={{ position: "relative" }}>
                     <div
                       style={{
@@ -620,17 +701,14 @@ const Signup = () => {
                         top: "50%",
                         transform: "translateY(-50%)",
                         pointerEvents: "none",
+                        zIndex: 2,
                       }}
                     >
                       <GlobeAltIcon
                         style={{
                           width: 16,
                           height: 16,
-                          color: errors.country
-                            ? "#EF4444"
-                            : focused.country
-                              ? "#C9A84C"
-                              : "#2E4A60",
+                          color: iconColor("country"),
                         }}
                       />
                     </div>
@@ -646,10 +724,7 @@ const Signup = () => {
                         setFocused((p) => ({ ...p, country: false }))
                       }
                       style={{
-                        ...(errors.country ? errorInput : baseInput),
-                        ...(focused.country && !errors.country
-                          ? focusStyle
-                          : {}),
+                        ...inp("country"),
                         appearance: "none",
                         paddingRight: 36,
                       }}
@@ -677,6 +752,7 @@ const Signup = () => {
                         top: "50%",
                         transform: "translateY(-50%)",
                         pointerEvents: "none",
+                        zIndex: 2,
                       }}
                     >
                       <svg
@@ -684,30 +760,14 @@ const Signup = () => {
                         height="12"
                         viewBox="0 0 24 24"
                         fill="none"
-                        stroke={errors.country ? "#EF4444" : "#2E4A60"}
+                        stroke={iconColor("country")}
                         strokeWidth="2"
                       >
                         <path d="M19 9l-7 7-7-7" />
                       </svg>
                     </div>
                   </div>
-                  {errors.country && (
-                    <p
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 4,
-                        fontSize: 11,
-                        color: "#EF4444",
-                        marginTop: 4,
-                      }}
-                    >
-                      <ExclamationCircleIcon
-                        style={{ width: 12, height: 12 }}
-                      />
-                      {errors.country}
-                    </p>
-                  )}
+                  <FieldError name="country" />
                 </div>
 
                 {/* Password */}
@@ -720,17 +780,7 @@ const Signup = () => {
                       marginBottom: 6,
                     }}
                   >
-                    <label
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 600,
-                        color: "#4A6E8A",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.1em",
-                      }}
-                    >
-                      Password
-                    </label>
+                    <Label>Password</Label>
                     {formData.password && (
                       <div
                         style={{
@@ -741,7 +791,7 @@ const Signup = () => {
                       >
                         <div
                           style={{
-                            width: 60,
+                            width: 56,
                             height: 3,
                             borderRadius: 2,
                             background: "rgba(201,168,76,0.1)",
@@ -752,7 +802,7 @@ const Signup = () => {
                             style={{
                               width: `${passwordStrength}%`,
                               height: "100%",
-                              background: getStrengthColor(passwordStrength),
+                              background: strengthColor(passwordStrength),
                               borderRadius: 2,
                               transition: "all 0.3s",
                             }}
@@ -762,14 +812,15 @@ const Signup = () => {
                           style={{
                             fontSize: 11,
                             fontWeight: 600,
-                            color: getStrengthColor(passwordStrength),
+                            color: strengthColor(passwordStrength),
                           }}
                         >
-                          {getStrengthText(passwordStrength)}
+                          {strengthText(passwordStrength)}
                         </span>
                       </div>
                     )}
                   </div>
+
                   <div style={{ position: "relative" }}>
                     <div
                       style={{
@@ -778,17 +829,14 @@ const Signup = () => {
                         top: "50%",
                         transform: "translateY(-50%)",
                         pointerEvents: "none",
+                        zIndex: 2,
                       }}
                     >
                       <KeyIcon
                         style={{
                           width: 16,
                           height: 16,
-                          color: errors.password
-                            ? "#EF4444"
-                            : focused.password
-                              ? "#C9A84C"
-                              : "#2E4A60",
+                          color: iconColor("password"),
                         }}
                       />
                     </div>
@@ -805,17 +853,11 @@ const Signup = () => {
                         setFocused((p) => ({ ...p, password: false }))
                       }
                       placeholder="Create a strong password"
-                      style={{
-                        ...(errors.password ? errorInput : baseInput),
-                        ...(focused.password && !errors.password
-                          ? focusStyle
-                          : {}),
-                        paddingRight: 44,
-                      }}
+                      style={{ ...inp("password"), paddingRight: 44 }}
                     />
                     <button
                       type="button"
-                      onClick={() => setShowPassword(!showPassword)}
+                      onClick={() => setShowPassword((s) => !s)}
                       style={{
                         position: "absolute",
                         right: 12,
@@ -827,6 +869,7 @@ const Signup = () => {
                         color: "#2E4A60",
                         padding: 0,
                         display: "flex",
+                        zIndex: 2,
                       }}
                       onMouseEnter={(e) =>
                         (e.currentTarget.style.color = "#C9A84C")
@@ -842,32 +885,15 @@ const Signup = () => {
                       )}
                     </button>
                   </div>
-                  {errors.password && (
-                    <p
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 4,
-                        fontSize: 11,
-                        color: "#EF4444",
-                        marginTop: 4,
-                      }}
-                    >
-                      <ExclamationCircleIcon
-                        style={{ width: 12, height: 12 }}
-                      />
-                      {errors.password}
-                    </p>
-                  )}
+                  <FieldError name="password" />
 
-                  {/* Requirements */}
                   {formData.password && (
                     <div
                       style={{
                         display: "grid",
                         gridTemplateColumns: "1fr 1fr",
-                        gap: "6px 12px",
-                        marginTop: 12,
+                        gap: "5px 10px",
+                        marginTop: 10,
                       }}
                     >
                       {passwordRequirements.map((req, i) => (
@@ -876,14 +902,14 @@ const Signup = () => {
                           style={{
                             display: "flex",
                             alignItems: "center",
-                            gap: 6,
+                            gap: 5,
                           }}
                         >
                           {req.met ? (
                             <CheckCircleIcon
                               style={{
-                                width: 13,
-                                height: 13,
+                                width: 12,
+                                height: 12,
                                 color: "#4ADE80",
                                 flexShrink: 0,
                               }}
@@ -891,8 +917,8 @@ const Signup = () => {
                           ) : (
                             <div
                               style={{
-                                width: 13,
-                                height: 13,
+                                width: 12,
+                                height: 12,
                                 borderRadius: "50%",
                                 border: "1px solid rgba(201,168,76,0.15)",
                                 flexShrink: 0,
@@ -919,11 +945,12 @@ const Signup = () => {
                   disabled={loading || !isFormValid()}
                   style={{
                     width: "100%",
-                    padding: "14px",
+                    padding: "13px",
                     borderRadius: 12,
                     border: "none",
                     fontSize: 14,
                     fontWeight: 700,
+                    marginTop: 4,
                     cursor:
                       loading || !isFormValid() ? "not-allowed" : "pointer",
                     background:
@@ -935,7 +962,6 @@ const Signup = () => {
                         ? "rgba(201,168,76,0.3)"
                         : "#07111F",
                     transition: "all 0.3s",
-                    marginTop: 4,
                   }}
                   onMouseEnter={(e) => {
                     if (!loading && isFormValid())
@@ -957,8 +983,8 @@ const Signup = () => {
                     >
                       <span
                         style={{
-                          width: 16,
-                          height: 16,
+                          width: 15,
+                          height: 15,
                           border: "2px solid rgba(201,168,76,0.3)",
                           borderTopColor: "#C9A84C",
                           borderRadius: "50%",
@@ -977,8 +1003,8 @@ const Signup = () => {
               {/* Login link */}
               <div
                 style={{
-                  marginTop: 28,
-                  paddingTop: 24,
+                  marginTop: 24,
+                  paddingTop: 20,
                   borderTop: "1px solid rgba(201,168,76,0.08)",
                   textAlign: "center",
                 }}
@@ -991,7 +1017,6 @@ const Signup = () => {
                       color: "#C9A84C",
                       fontWeight: 700,
                       textDecoration: "none",
-                      transition: "color 0.2s",
                     }}
                     onMouseEnter={(e) =>
                       (e.currentTarget.style.color = "#F0C040")
