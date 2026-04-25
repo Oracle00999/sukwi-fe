@@ -137,7 +137,7 @@ const UserNav = () => {
             >
               <QFSLogo size={36} />
             </div>
-            <div
+            {/* <div
               style={{
                 display: "flex",
                 flexDirection: "column",
@@ -166,7 +166,7 @@ const UserNav = () => {
               >
                 Ledger
               </span>
-            </div>
+            </div> */}
           </div>
 
           {/* ── Right: User avatar + sign out ── */}

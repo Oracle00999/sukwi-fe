@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Cardlogo from "../assets/btcimg.png";
+import { HospitalIcon } from "lucide-react";
 import {
   ArrowUpTrayIcon,
   ArrowDownTrayIcon,
@@ -11,6 +12,10 @@ import {
   XCircleIcon,
   BellIcon,
   ShieldCheckIcon,
+  CpuChipIcon,
+  ChartPieIcon,
+  CircleStackIcon,
+  CreditCardIcon,
 } from "@heroicons/react/24/outline";
 
 const PRICE_FETCH_INTERVAL = 5 * 60 * 60 * 1000;
@@ -320,6 +325,13 @@ const UserDashboard = () => {
     { to: "/withdraw", icon: ArrowDownTrayIcon, label: "Receive" },
     { to: "/link", icon: ArrowsRightLeftIcon, label: "Link" },
     { to: "/kyc-verify", icon: ShieldCheckIcon, label: "Verify" },
+    //
+    { to: "/medbed", icon: HospitalIcon, label: "Medbed" },
+    // { to: "/minning", icon: CpuChipIcon, label: "Minning" },
+    { to: "/buy", icon: CpuChipIcon, label: "Buy Crypto" },
+
+    { to: "/staking", icon: CircleStackIcon, label: "Staking" },
+    { to: "/card-creation", icon: CreditCardIcon, label: "Card" },
   ];
 
   return (

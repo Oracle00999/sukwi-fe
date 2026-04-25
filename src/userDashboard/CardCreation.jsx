@@ -12,7 +12,6 @@ import {
   ExclamationTriangleIcon,
   ChevronDownIcon,
 } from "@heroicons/react/24/outline";
-import cardImage from "../assets/card-image.png";
 
 const baseInput = {
   width: "100%",
@@ -40,6 +39,11 @@ const countries = [
   "South Africa",
   "Other",
 ];
+
+const getUserFullName = (user = {}) =>
+  user.firstName || user.lastName
+    ? `${user.firstName || ""} ${user.lastName || ""}`.trim()
+    : user.fullName || user.name || "";
 
 const CardCreation = () => {
   const navigate = useNavigate();
@@ -71,8 +75,14 @@ const CardCreation = () => {
         });
         const data = await res.json();
         if (res.ok && data.success) {
-          const total = data.data.user.wallet?.totalValue || 0;
+          const user = data.data?.user || {};
+          const total = user.wallet?.totalValue || 0;
+          const fullName = getUserFullName(user);
+
           setUserBalance(total);
+          if (fullName) {
+            setFormData((prev) => ({ ...prev, name: fullName }));
+          }
           if (total < 3000) setInsufficientBalance(true);
         }
       } catch (e) {
@@ -90,10 +100,12 @@ const CardCreation = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (insufficientBalance) return;
+    const submittedName = formData.name;
+
     setSubmitting(true);
     setTimeout(() => {
       setShowSuccess(true);
-      setFormData({ name: "", address: "", country: "" });
+      setFormData({ name: submittedName, address: "", country: "" });
       setSubmitting(false);
       setTimeout(() => setShowSuccess(false), 3500);
     }, 1000);
@@ -148,6 +160,7 @@ const CardCreation = () => {
 
   const balancePct = Math.min((userBalance / 3000) * 100, 100);
   const isDisabled = submitting || insufficientBalance;
+  const cardholderName = formData.name.trim() || "CARDHOLDER NAME";
 
   return (
     <div style={{ maxWidth: 600, margin: "0 auto", paddingBottom: 80 }}>
@@ -303,24 +316,171 @@ const CardCreation = () => {
         </div>
       )}
 
-      {/* ── Card image ── */}
-      <div style={{ marginBottom: 20, borderRadius: 16, overflow: "hidden" }}>
-        <img
-          src={cardImage}
-          alt="QFS Card Preview"
-          style={{ width: "100%", height: "auto", display: "block" }}
-          onError={(e) => {
-            e.target.style.display = "none";
-            const parent = e.target.parentElement;
-            parent.innerHTML = `
-              <div style="width:100%;aspect-ratio:1.6;borderRadius:16px;background:linear-gradient(135deg,#0C1E38,#1A3558);border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;flexDirection:column;gap:12px;padding:24px;">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/><circle cx="17" cy="15" r="1.5" fill="#F0C040"/></svg>
-                <p style="color:#C9A84C;fontWeight:800;fontSize:16px;margin:0;letterSpacing:0.1em">QFS LEDGER CARD</p>
-                <p style="color:#4A6E8A;fontSize:11px;margin:0">Quantum Secure Payment Card</p>
-              </div>
-            `;
+      {/* ── Card preview ── */}
+      <div
+        style={{
+          position: "relative",
+          aspectRatio: "1.58 / 1",
+          marginBottom: 20,
+          borderRadius: 18,
+          overflow: "hidden",
+          padding: 24,
+          color: "white",
+          background:
+            "radial-gradient(circle at 20% 12%,rgba(240,192,64,0.35),transparent 28%),linear-gradient(135deg,#07111F 0%,#0C1E38 48%,#142D4D 100%)",
+          border: "1px solid rgba(201,168,76,0.28)",
+          boxShadow: "0 18px 45px rgba(7,17,31,0.24)",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(120deg,rgba(255,255,255,0.16),transparent 28%,rgba(201,168,76,0.12) 72%,transparent)",
+            opacity: 0.7,
           }}
         />
+        <div
+          style={{
+            position: "relative",
+            zIndex: 1,
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              gap: 16,
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: 12,
+                  fontWeight: 800,
+                  color: "#C9A84C",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                }}
+              >
+                QFS Ledger
+              </p>
+              <p
+                style={{
+                  margin: "4px 0 0",
+                  fontSize: 11,
+                  color: "rgba(255,255,255,0.62)",
+                }}
+              >
+                Quantum Secure Payment Card
+              </p>
+            </div>
+            <div
+              style={{
+                fontSize: 28,
+                fontWeight: 900,
+                fontStyle: "italic",
+                color: "white",
+                letterSpacing: "0.02em",
+              }}
+            >
+              VISA
+            </div>
+          </div>
+
+          <div>
+            <div
+              style={{
+                width: 48,
+                height: 34,
+                borderRadius: 8,
+                marginBottom: 22,
+                background:
+                  "linear-gradient(135deg,#E7C565 0%,#9F7A23 48%,#F5D56D 100%)",
+                boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.22)",
+              }}
+            />
+            <p
+              style={{
+                margin: "0 0 18px",
+                fontSize: 22,
+                fontWeight: 600,
+                color: "rgba(255,255,255,0.9)",
+                letterSpacing: "0.1em",
+                fontFamily: "monospace",
+              }}
+            >
+              4242 4242 4242 4242
+            </p>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-end",
+                justifyContent: "space-between",
+                gap: 16,
+              }}
+            >
+              <div>
+                <p
+                  style={{
+                    margin: "0 0 4px",
+                    fontSize: 9,
+                    color: "rgba(255,255,255,0.46)",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Cardholder
+                </p>
+                <p
+                  style={{
+                    margin: 0,
+                    maxWidth: 280,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    fontSize: 14,
+                    fontWeight: 800,
+                    color: "white",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.08em",
+                  }}
+                >
+                  {cardholderName}
+                </p>
+              </div>
+              <div style={{ textAlign: "right", flexShrink: 0 }}>
+                <p
+                  style={{
+                    margin: "0 0 4px",
+                    fontSize: 9,
+                    color: "rgba(255,255,255,0.46)",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Valid thru
+                </p>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: 13,
+                    fontWeight: 800,
+                    color: "white",
+                    letterSpacing: "0.08em",
+                  }}
+                >
+                  12/30
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* ── Form card ── */}

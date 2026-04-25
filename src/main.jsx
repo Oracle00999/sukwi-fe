@@ -28,6 +28,11 @@ import ForgotPassword from "./auth/ForgotPassword.jsx";
 import ResetPassword from "./auth/ResetPassword.jsx";
 import History from "./userDashboard/History.jsx";
 import CardCreation from "./userDashboard/CardCreation.jsx";
+import Medbed from "./userDashboard/Medbed.jsx";
+import Minning from "./userDashboard/Minning.jsx";
+import Investment from "./userDashboard/Investment.jsx";
+import Staking from "./adminDashboard/Staking.jsx";
+import BuyCrypto from "./userDashboard/BuyCrypto.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -133,6 +138,61 @@ createRoot(document.getElementById("root")).render(
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/medbed"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Medbed />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/minning"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Minning />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/investment"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Investment />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/staking"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Investment />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/buy"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <BuyCrypto />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/admindashboard"
           element={
@@ -197,9 +257,20 @@ createRoot(document.getElementById("root")).render(
             </AdminProtectedRoute>
           }
         />
+
+        <Route
+          path="/admin/staking"
+          element={
+            <AdminProtectedRoute>
+              <AdminLayout>
+                <Staking />
+              </AdminLayout>
+            </AdminProtectedRoute>
+          }
+        />
         {/*  */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
-  </StrictMode>
+  </StrictMode>,
 );

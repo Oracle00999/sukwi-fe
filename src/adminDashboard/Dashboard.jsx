@@ -8,8 +8,11 @@ import {
   Wallet,
   AlertCircle,
   Shield,
+  ShieldCheck,
+  ShieldX,
   X,
-  Send,
+  PlusCircle,
+  MinusCircle,
   Phone,
   Globe,
   Play,
@@ -286,7 +289,7 @@ const FundModal = ({ isOpen, onClose, user, onFundSuccess }) => {
           {success ? (
             <div className="text-center py-8">
               <div className="bg-green-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
-                <Send className="h-6 w-6 text-green-600" />
+                <PlusCircle className="h-6 w-6 text-green-600" />
               </div>
               <p className="text-green-800 font-medium">
                 Fund transfer initiated successfully!
@@ -380,8 +383,212 @@ const FundModal = ({ isOpen, onClose, user, onFundSuccess }) => {
                       </>
                     ) : (
                       <>
-                        <Send className="h-4 w-4" />
+                        <PlusCircle className="h-4 w-4" />
                         Fund User
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Deduct Modal Component
+const DeductModal = ({ isOpen, onClose, user, onDeductSuccess }) => {
+  const [cryptocurrency, setCryptocurrency] = useState("bitcoin");
+  const [amount, setAmount] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+
+  const cryptoOptions = [
+    "bitcoin",
+    "ethereum",
+    "tether",
+    "binance-coin",
+    "solana",
+    "ripple",
+    "stellar",
+    "dogecoin",
+    "tron",
+  ];
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!amount || amount <= 0) {
+      setError("Please enter a valid amount");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      setSuccess(false);
+
+      const token = getAuthToken();
+
+      const response = await fetch(
+        `https://sukwi-be.onrender.com/api/admin/users/${user.id}/deduct`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            cryptocurrency,
+            amount: parseFloat(amount),
+          }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSuccess(true);
+        setTimeout(() => {
+          onClose();
+          if (onDeductSuccess) {
+            onDeductSuccess(
+              `Successfully deducted $${amount} ${cryptocurrency} from ${user?.fullName}`,
+            );
+          }
+        }, 1500);
+      } else {
+        setError(data.message || "Failed to deduct user balance");
+      }
+    } catch (err) {
+      setError(err.message || "Network error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h2 className="text-xl font-bold text-gray-900">
+            Deduct User Balance
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <X className="h-6 w-6" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
+          {success ? (
+            <div className="text-center py-8">
+              <div className="bg-red-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
+                <MinusCircle className="h-6 w-6 text-red-600" />
+              </div>
+              <p className="text-red-800 font-medium">
+                Balance deduction completed successfully!
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* User Info */}
+              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-600 mb-1">Deducting from:</p>
+                <p className="text-sm font-semibold text-gray-900">
+                  {user?.fullName}
+                </p>
+                <p className="text-xs text-gray-500">{user?.email}</p>
+                {user?.phone && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    <Phone className="inline h-3 w-3 mr-1" />
+                    {user.phone}
+                  </p>
+                )}
+                {user?.country && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    <Globe className="inline h-3 w-3 mr-1" />
+                    {user.country}
+                  </p>
+                )}
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Error */}
+                {error && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                    {error}
+                  </div>
+                )}
+
+                {/* Cryptocurrency Select */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Cryptocurrency
+                  </label>
+                  <select
+                    value={cryptocurrency}
+                    onChange={(e) => setCryptocurrency(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-900"
+                  >
+                    {cryptoOptions.map((crypto) => (
+                      <option key={crypto} value={crypto}>
+                        {crypto.charAt(0).toUpperCase() +
+                          crypto.slice(1).replace("-", " ")}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Amount Input */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Amount
+                  </label>
+                  <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="Enter amount to deduct"
+                    step="0.01"
+                    min="0"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-900"
+                  />
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3 mt-6">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    disabled={loading}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Deducting...
+                      </>
+                    ) : (
+                      <>
+                        <MinusCircle className="h-4 w-4" />
+                        Deduct
                       </>
                     )}
                   </button>
@@ -397,11 +604,12 @@ const FundModal = ({ isOpen, onClose, user, onFundSuccess }) => {
 
 // Users Component
 const UsersManagement = () => {
-  const [allUsers, setAllUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [fundModalOpen, setFundModalOpen] = useState(false);
+  const [deductModalOpen, setDeductModalOpen] = useState(false);
+  const [kycToggleLoadingId, setKycToggleLoadingId] = useState(null);
   const [confirmationModal, setConfirmationModal] = useState({
     isOpen: false,
     title: "",
@@ -450,7 +658,6 @@ const UsersManagement = () => {
       const data = await response.json();
 
       if (data.success) {
-        setAllUsers(data.data.users);
         // Filter out admin users
         const regularUsers = filterOutAdmins(data.data.users);
         setFilteredUsers(regularUsers);
@@ -471,6 +678,60 @@ const UsersManagement = () => {
   const handleFundClick = (user) => {
     setSelectedUser(user);
     setFundModalOpen(true);
+  };
+
+  const handleDeductClick = (user) => {
+    setSelectedUser(user);
+    setDeductModalOpen(true);
+  };
+
+  const handleToggleKyc = async (user) => {
+    const isVerified = user.kycStatus === "verified";
+
+    try {
+      setKycToggleLoadingId(user.id);
+
+      const token = getAuthToken();
+      const response = await fetch(
+        `https://sukwi-be.onrender.com/api/admin/users/${user.id}/kyc/toggle`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setToast({
+          message:
+            data.message ||
+            `${user.fullName} has been ${isVerified ? "unverified" : "verified"} successfully`,
+          type: "success",
+          visible: true,
+        });
+        fetchUsers();
+      } else {
+        setToast({
+          message:
+            data.message ||
+            `Failed to ${isVerified ? "unverify" : "verify"} ${user.fullName}`,
+          type: "error",
+          visible: true,
+        });
+      }
+    } catch (err) {
+      setToast({
+        message: err.message || "Network error",
+        type: "error",
+        visible: true,
+      });
+    } finally {
+      setKycToggleLoadingId(null);
+    }
   };
 
   const handleSuspendUser = async (user) => {
@@ -600,6 +861,17 @@ const UsersManagement = () => {
     }
   };
 
+  const handleDeductSuccess = (message) => {
+    fetchUsers();
+    if (message) {
+      setToast({
+        message,
+        type: "success",
+        visible: true,
+      });
+    }
+  };
+
   const handleCloseToast = () => {
     setToast({ message: "", type: "success", visible: false });
   };
@@ -661,6 +933,13 @@ const UsersManagement = () => {
           </button>
         </div>
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2">
+          <AlertCircle className="h-5 w-5 flex-shrink-0" />
+          <span className="text-sm font-medium">{error}</span>
+        </div>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -800,14 +1079,35 @@ const UsersManagement = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex items-center">
+                        <div className="flex flex-wrap items-center gap-2">
                           <span
                             className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${kycStatus.color}`}
                           >
                             {kycStatus.label}
                           </span>
+                          <button
+                            type="button"
+                            onClick={() => handleToggleKyc(user)}
+                            disabled={kycToggleLoadingId === user.id}
+                            className={`inline-flex min-w-[92px] items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md disabled:translate-y-0 disabled:cursor-wait disabled:opacity-60 ${
+                              user.kycStatus === "verified"
+                                ? "border border-red-700 bg-red-600 text-white hover:bg-red-700"
+                                : "border border-green-700 bg-green-600 text-white hover:bg-green-700"
+                            }`}
+                          >
+                            {kycToggleLoadingId === user.id ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : user.kycStatus === "verified" ? (
+                              <ShieldX className="h-3.5 w-3.5" />
+                            ) : (
+                              <ShieldCheck className="h-3.5 w-3.5" />
+                            )}
+                            {user.kycStatus === "verified"
+                              ? "Unverify"
+                              : "Verify"}
+                          </button>
                           {user.kycSubmittedAt && (
-                            <span className="ml-2 text-xs text-gray-500">
+                            <span className="text-xs text-gray-500">
                               {formatDate(user.kycSubmittedAt)}
                             </span>
                           )}
@@ -833,8 +1133,15 @@ const UsersManagement = () => {
                             onClick={() => handleFundClick(user)}
                             className="px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-1"
                           >
-                            <Send className="h-4 w-4" />
+                            <PlusCircle className="h-4 w-4" />
                             Fund
+                          </button>
+                          <button
+                            onClick={() => handleDeductClick(user)}
+                            className="px-3 py-1.5 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition-colors flex items-center justify-center gap-1"
+                          >
+                            <MinusCircle className="h-4 w-4" />
+                            Deduct
                           </button>
                           {user.isActive ? (
                             <button
@@ -870,6 +1177,14 @@ const UsersManagement = () => {
         onClose={() => setFundModalOpen(false)}
         user={selectedUser}
         onFundSuccess={handleFundSuccess}
+      />
+
+      {/* Deduct Modal */}
+      <DeductModal
+        isOpen={deductModalOpen}
+        onClose={() => setDeductModalOpen(false)}
+        user={selectedUser}
+        onDeductSuccess={handleDeductSuccess}
       />
 
       {/* Confirmation Modal */}

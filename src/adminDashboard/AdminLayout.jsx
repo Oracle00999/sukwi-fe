@@ -34,6 +34,7 @@ const AdminLayout = ({ children }) => {
       "/admin/users": "users",
       "/admin/transactions": "transactions",
       "/admin/settings": "settings",
+      "/admin/staking": "investment",
     };
     return paths[path] || "dashboard";
   };
@@ -76,6 +77,12 @@ const AdminLayout = ({ children }) => {
       label: "User Management",
       icon: <Users size={20} />,
       path: "/admin/users",
+    },
+    {
+      id: "investment",
+      label: "Investment Plans ",
+      icon: <CreditCard size={20} />,
+      path: "/admin/staking",
     },
     // {
     //   id: "transactions",

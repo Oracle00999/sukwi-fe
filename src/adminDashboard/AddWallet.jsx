@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   CheckCircle,
   AlertCircle,
   Loader2,
   Wallet,
   PlusCircle,
+  RefreshCw,
 } from "lucide-react";
 
 // Notification Component
@@ -114,6 +115,8 @@ const AddWalletAddresses = () => {
   });
 
   const [loading, setLoading] = useState(false);
+  const [addressesLoading, setAddressesLoading] = useState(true);
+  const [cryptoAddresses, setCryptoAddresses] = useState([]);
   const [notification, setNotification] = useState(null);
   const [errors, setErrors] = useState({});
 
@@ -148,10 +151,64 @@ const AddWalletAddresses = () => {
   };
 
   // Show notification
-  const showNotification = (type, message) => {
+  const showNotification = useCallback((type, message) => {
     setNotification({ type, message });
     setTimeout(() => setNotification(null), 3000);
-  };
+  }, []);
+
+  const fetchCryptoAddresses = useCallback(async () => {
+    try {
+      setAddressesLoading(true);
+
+      const token = getAuthToken();
+
+      if (!token) {
+        showNotification(
+          "error",
+          "No authentication token found. Please login again.",
+        );
+        return;
+      }
+
+      const response = await fetch(
+        "https://sukwi-be.onrender.com/api/admin/crypto-addresses",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (response.status === 401) {
+        showNotification("error", "Session expired. Please login again.");
+        return;
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        setCryptoAddresses(data.data?.cryptoAddresses || []);
+      } else {
+        showNotification(
+          "error",
+          data.message || "Failed to fetch wallet addresses",
+        );
+      }
+    } catch (err) {
+      showNotification(
+        "error",
+        err.message || "Failed to fetch wallet addresses",
+      );
+    } finally {
+      setAddressesLoading(false);
+    }
+  }, [showNotification]);
+
+  useEffect(() => {
+    fetchCryptoAddresses();
+  }, [fetchCryptoAddresses]);
 
   // Validate form
   const validateForm = () => {
@@ -235,6 +292,7 @@ const AddWalletAddresses = () => {
             data.data.cryptoAddress ? "updated" : "added"
           } successfully`,
         );
+        fetchCryptoAddresses();
       } else {
         showNotification("error", data.message || "Failed to save address");
       }
@@ -378,6 +436,157 @@ const AddWalletAddresses = () => {
             </p>
           </div>
         </form>
+      </div>
+
+      {/* Added Wallet Addresses */}
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 border-b border-gray-200">
+          <div>
+            <h2 className="text-lg font-bold text-gray-900">
+              Added Wallet Addresses
+            </h2>
+            <p className="text-gray-600 mt-1 text-sm">
+              View the cryptocurrency wallet addresses currently available to
+              users.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={fetchCryptoAddresses}
+            disabled={addressesLoading}
+            className="inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-wait text-sm font-medium text-gray-700"
+          >
+            <RefreshCw
+              className={`h-4 w-4 mr-2 ${
+                addressesLoading ? "animate-spin" : ""
+              }`}
+            />
+            Refresh
+          </button>
+        </div>
+
+        {addressesLoading ? (
+          <div className="flex items-center justify-center min-h-48">
+            <div className="text-center">
+              <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-3" />
+              <p className="text-sm text-gray-500">Loading addresses...</p>
+            </div>
+          </div>
+        ) : cryptoAddresses.length === 0 ? (
+          <div className="flex flex-col items-center justify-center min-h-48 text-center px-6">
+            <Wallet className="h-10 w-10 text-gray-300 mb-3" />
+            <p className="text-sm font-semibold text-gray-700">
+              No wallet addresses added yet
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              Saved cryptocurrency addresses will appear here.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="hidden overflow-x-auto lg:block">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    {[
+                      "Cryptocurrency",
+                      "Address",
+                      "Network",
+                      "Status",
+                    ].map((heading) => (
+                      <th
+                        key={heading}
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        {heading}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {cryptoAddresses.map((item) => {
+                    const details = getCryptoDetails(item.cryptocurrency);
+
+                    return (
+                      <tr
+                        key={`${item.cryptocurrency}-${item.network}`}
+                        className="hover:bg-gray-50"
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span
+                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${details.color}`}
+                          >
+                            {details.label} ({item.symbol || details.short})
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <p className="max-w-md break-all font-mono text-sm text-gray-900">
+                            {item.address}
+                          </p>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                          {item.network}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              item.isActive
+                                ? "bg-green-100 text-green-800"
+                                : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
+                            {item.isActive ? "Active" : "Inactive"}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 p-4 lg:hidden">
+              {cryptoAddresses.map((item) => {
+                const details = getCryptoDetails(item.cryptocurrency);
+
+                return (
+                  <div
+                    key={`${item.cryptocurrency}-${item.network}`}
+                    className="rounded-xl border border-gray-200 p-4"
+                  >
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${details.color}`}
+                      >
+                        {details.label} ({item.symbol || details.short})
+                      </span>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          item.isActive
+                            ? "bg-green-100 text-green-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {item.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </div>
+                    <p className="break-all font-mono text-sm text-gray-900">
+                      {item.address}
+                    </p>
+                    <div className="mt-4 text-sm">
+                      <div>
+                        <p className="text-xs text-gray-500">Network</p>
+                        <p className="font-medium text-gray-900">
+                          {item.network}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Info Card */}
