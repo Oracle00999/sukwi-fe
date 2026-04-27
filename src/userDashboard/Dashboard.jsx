@@ -1,7 +1,6 @@
 // pages/UserDashboard.jsx
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Cardlogo from "../assets/btcimg.png";
 import { HospitalIcon } from "lucide-react";
 import {
   ArrowUpTrayIcon,
@@ -13,7 +12,6 @@ import {
   BellIcon,
   ShieldCheckIcon,
   CpuChipIcon,
-  ChartPieIcon,
   CircleStackIcon,
   CreditCardIcon,
 } from "@heroicons/react/24/outline";
@@ -56,7 +54,6 @@ const tokenSymbols = {
   tron: "TRX",
 };
 
-// CoinGecko image IDs for API logos
 const tokenCoinGeckoIds = {
   bitcoin: "bitcoin",
   ethereum: "ethereum",
@@ -73,6 +70,30 @@ const notifications = [
   { id: 1, message: "Welcome to QFS Ledger!", read: false },
 ];
 
+const actionButtons = [
+  { to: "/deposit", icon: ArrowUpTrayIcon, label: "Deposit" },
+  { to: "/withdraw", icon: ArrowDownTrayIcon, label: "Receive" },
+  { to: "/link", icon: ArrowsRightLeftIcon, label: "Link" },
+  { to: "/kyc-verify", icon: ShieldCheckIcon, label: "Verify" },
+  { to: "/medbed", icon: HospitalIcon, label: "Medbed" },
+  { to: "/buy", icon: CpuChipIcon, label: "Buy Crypto" },
+  { to: "/staking", icon: CircleStackIcon, label: "Staking" },
+  { to: "/card-creation", icon: CreditCardIcon, label: "Card" },
+];
+
+const kycConfig = {
+  verified: {
+    icon: CheckBadgeIcon,
+    label: "KYC Verified",
+    className: "border-emerald-400/25 bg-emerald-400/10 text-emerald-400",
+  },
+  pending: {
+    icon: ClockIcon,
+    label: "KYC Pending",
+    className: "border-amber-400/25 bg-amber-400/10 text-amber-400",
+  },
+};
+
 const UserDashboard = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -82,7 +103,6 @@ const UserDashboard = () => {
   const [initialized, setInitialized] = useState(false);
   const [tokenAmounts, setTokenAmounts] = useState({});
 
-  // ── Fetch coin logos from CoinGecko markets endpoint ──
   const fetchTokenLogos = async () => {
     try {
       const ids = Object.values(tokenCoinGeckoIds).join(",");
@@ -90,6 +110,7 @@ const UserDashboard = () => {
         `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${ids}&per_page=20&sparkline=false`,
       );
       if (!res.ok) return;
+
       const data = await res.json();
       const logos = {};
       data.forEach((coin) => {
@@ -111,6 +132,7 @@ const UserDashboard = () => {
         `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`,
       );
       if (!res.ok) return;
+
       const data = await res.json();
       const prices = {};
       Object.keys(tokenIds).forEach((key) => {
@@ -129,6 +151,7 @@ const UserDashboard = () => {
 
   const calculateTokenAmounts = (prices) => {
     if (!userData?.wallet?.balances) return;
+
     const amounts = {};
     Object.keys(userData.wallet.balances).forEach((token) => {
       const usd = userData.wallet.balances[token];
@@ -145,6 +168,7 @@ const UserDashboard = () => {
         setLoading(false);
         return;
       }
+
       const res = await fetch("https://sukwi-be.onrender.com/api/auth/me", {
         method: "GET",
         headers: {
@@ -173,19 +197,20 @@ const UserDashboard = () => {
       fetchTokenPrices(true);
       setInitialized(true);
     }
+
     if (initialized) {
       const id = setInterval(fetchTokenPrices, PRICE_FETCH_INTERVAL);
       return () => clearInterval(id);
     }
   }, [userData, initialized]);
 
-  const formatCurrency = (v) =>
+  const formatCurrency = (value) =>
     new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-    }).format(v || 0);
+    }).format(value || 0);
 
   const formatTokenAmount = (amount, token) => {
     if (!amount) return "0";
@@ -204,7 +229,7 @@ const UserDashboard = () => {
   };
 
   const totalBalance = userData?.wallet?.balances
-    ? Object.values(userData.wallet.balances).reduce((s, v) => s + v, 0)
+    ? Object.values(userData.wallet.balances).reduce((sum, value) => sum + value, 0)
     : 0;
 
   const sortedTokens = userData?.wallet?.balances
@@ -218,338 +243,95 @@ const UserDashboard = () => {
         .sort((a, b) => b.usdBalance - a.usdBalance)
     : [];
 
-  const user = userData || {};
-
-  // ── KYC badge ──
   const KycBadge = ({ status }) => {
-    const cfg = {
-      verified: {
-        icon: CheckBadgeIcon,
-        label: "KYC Verified",
-        color: "#4ADE80",
-        bg: "rgba(74,222,128,0.08)",
-        border: "rgba(74,222,128,0.2)",
-      },
-      pending: {
-        icon: ClockIcon,
-        label: "KYC Pending",
-        color: "#F59E0B",
-        bg: "rgba(245,158,11,0.08)",
-        border: "rgba(245,158,11,0.2)",
-      },
-    }[status] || {
-      icon: XCircleIcon,
-      label: "KYC Required",
-      color: "#EF4444",
-      bg: "rgba(239,68,68,0.08)",
-      border: "rgba(239,68,68,0.2)",
-    };
-    const Icon = cfg.icon;
+    const cfg =
+      kycConfig[status] || {
+        icon: XCircleIcon,
+        label: "KYC Required",
+        className: "border-red-400/25 bg-red-400/10 text-red-400",
+      };
+
     return (
       <div
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 6,
-          padding: "4px 12px",
-          borderRadius: 999,
-          background: cfg.bg,
-          border: `1px solid ${cfg.border}`,
-        }}
+        className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold tracking-[0.05em] ${cfg.className}`}
       >
-        <Icon style={{ width: 14, height: 14, color: cfg.color }} />
-        <span
-          style={{
-            fontSize: 12,
-            fontWeight: 700,
-            color: cfg.color,
-            letterSpacing: "0.05em",
-          }}
-        >
-          {cfg.label}
-        </span>
+        {React.createElement(cfg.icon, { className: "h-3.5 w-3.5" })}
+        <span>{cfg.label}</span>
       </div>
     );
   };
 
-  // ── Loading state ──
   if (loading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: 320,
-        }}
-      >
-        <div style={{ textAlign: "center" }}>
-          <div
-            style={{
-              position: "relative",
-              width: 56,
-              height: 56,
-              margin: "0 auto 16px",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                borderRadius: "50%",
-                border: "3px solid rgba(201,168,76,0.1)",
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                borderRadius: "50%",
-                border: "3px solid transparent",
-                borderTopColor: "#C9A84C",
-                animation: "spin 0.9s linear infinite",
-              }}
-            />
+      <div className="flex min-h-80 items-center justify-center">
+        <div className="text-center">
+          <div className="relative mx-auto mb-4 h-14 w-14">
+            <div className="absolute inset-0 rounded-full border-[3px] border-[#C9A84C]/10" />
+            <div className="absolute inset-0 animate-spin rounded-full border-[3px] border-transparent border-t-[#C9A84C]" />
           </div>
-          <p style={{ fontSize: 13, color: "#3D5A70", fontWeight: 500 }}>
-            Loading your wallet…
+          <p className="text-sm font-medium text-[#3D5A70]">
+            Loading your wallet...
           </p>
         </div>
-        <style>{`@keyframes spin { to { transform:rotate(360deg); } }`}</style>
       </div>
     );
   }
 
-  const actionButtons = [
-    { to: "/deposit", icon: ArrowUpTrayIcon, label: "Deposit" },
-    { to: "/withdraw", icon: ArrowDownTrayIcon, label: "Receive" },
-    { to: "/link", icon: ArrowsRightLeftIcon, label: "Link" },
-    { to: "/kyc-verify", icon: ShieldCheckIcon, label: "Verify" },
-    //
-    { to: "/medbed", icon: HospitalIcon, label: "Medbed" },
-    // { to: "/minning", icon: CpuChipIcon, label: "Minning" },
-    { to: "/buy", icon: CpuChipIcon, label: "Buy Crypto" },
-
-    { to: "/staking", icon: CircleStackIcon, label: "Staking" },
-    { to: "/card-creation", icon: CreditCardIcon, label: "Card" },
-  ];
-
   return (
     <>
-      {/* ── Hero wallet card ── */}
-      <div
-        style={{
-          position: "relative",
-          borderRadius: 20,
-          overflow: "hidden",
-          marginBottom: 24,
-          border: "1px solid rgba(201,168,76,0.3)",
-          boxShadow:
-            "0 0 60px rgba(201,168,76,0.1), inset 0 1px 0 rgba(201,168,76,0.15)",
-        }}
-      >
-        {/* Background image — full cover */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage: `url(${Cardlogo})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        />
+      <section className="relative mb-6 overflow-hidden rounded-[20px] border border-[#C9A84C]/30 bg-[radial-gradient(circle_at_16%_18%,rgba(240,192,64,0.28),transparent_28%),radial-gradient(circle_at_88%_12%,rgba(56,189,248,0.12),transparent_26%),linear-gradient(135deg,#04090F_0%,#0C1E38_48%,#07111F_100%)] shadow-[0_0_60px_rgba(201,168,76,0.10),inset_0_1px_0_rgba(201,168,76,0.15)]">
+        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.12),transparent_28%,rgba(201,168,76,0.10)_72%,transparent)] opacity-85" />
+        <div className="relative z-[2] h-px bg-[linear-gradient(90deg,transparent,#C9A84C,#F0C040,#C9A84C,transparent)]" />
+        <div className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(rgba(201,168,76,0.16)_1px,transparent_1px),linear-gradient(90deg,rgba(201,168,76,0.12)_1px,transparent_1px)] bg-[length:34px_34px] opacity-10 [mask-image:linear-gradient(135deg,rgba(0,0,0,0.8),transparent_72%)]" />
+        <div className="pointer-events-none absolute -bottom-24 -right-20 z-[1] h-56 w-56 rounded-full border border-[#C9A84C]/15 shadow-[inset_0_0_0_28px_rgba(201,168,76,0.025),inset_0_0_0_56px_rgba(201,168,76,0.02)]" />
 
-        {/* Light dark overlay — lets image show through */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(135deg, rgba(4,9,15,0.60) 0%, rgba(12,30,56,0.52) 50%, rgba(7,17,31,0.62) 100%)",
-          }}
-        />
-
-        {/* Top gold hairline */}
-        <div
-          style={{
-            position: "relative",
-            zIndex: 2,
-            height: 1,
-            background:
-              "linear-gradient(90deg, transparent, #C9A84C, #F0C040, #C9A84C, transparent)",
-          }}
-        />
-
-        {/* Subtle hex grid */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            pointerEvents: "none",
-            opacity: 0.05,
-            zIndex: 1,
-            backgroundImage:
-              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpath d='M28 66L0 50V17L28 1L56 17V50Z' fill='none' stroke='%23C9A84C' stroke-width='1'/%3E%3C/svg%3E\")",
-            backgroundSize: "56px 100px",
-          }}
-        />
-
-        <div
-          style={{
-            padding: "1.5rem 1.5rem 1.25rem",
-            position: "relative",
-            zIndex: 2,
-          }}
-        >
-          {/* Top row: KYC + Bell */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: 20,
-            }}
-          >
+        <div className="relative z-[2] px-6 pb-5 pt-6">
+          <div className="mb-5 flex items-center justify-between">
             <KycBadge status={userData?.kycStatus} />
 
-            {/* Bell */}
-            <div style={{ position: "relative" }}>
+            <div className="relative">
               <button
-                onClick={() => setShowNotifications(!showNotifications)}
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background: "rgba(201,168,76,0.08)",
-                  border: "1px solid rgba(201,168,76,0.2)",
-                  cursor: "pointer",
-                  position: "relative",
-                }}
+                type="button"
+                onClick={() => setShowNotifications((value) => !value)}
+                className="relative flex h-9 w-9 items-center justify-center rounded-full border border-[#C9A84C]/20 bg-[#C9A84C]/10 transition hover:border-[#C9A84C]/40 hover:bg-[#C9A84C]/15"
               >
-                <BellIcon style={{ width: 17, height: 17, color: "#C9A84C" }} />
-                {notifications.some((n) => !n.read) && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: -2,
-                      right: -2,
-                      width: 8,
-                      height: 8,
-                      borderRadius: "50%",
-                      background: "#EF4444",
-                      border: "2px solid #07111F",
-                    }}
-                  />
+                <BellIcon className="h-4 w-4 text-[#C9A84C]" />
+                {notifications.some((notification) => !notification.read) && (
+                  <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full border-2 border-[#07111F] bg-red-500" />
                 )}
               </button>
 
               {showNotifications && (
-                <div
-                  style={{
-                    position: "absolute",
-                    right: 0,
-                    top: 44,
-                    width: 280,
-                    borderRadius: 16,
-                    background: "#0C1E38",
-                    border: "1px solid rgba(201,168,76,0.2)",
-                    boxShadow: "0 16px 40px rgba(0,0,0,0.5)",
-                    zIndex: 50,
-                    overflow: "hidden",
-                  }}
-                >
-                  <div
-                    style={{
-                      height: 1,
-                      background:
-                        "linear-gradient(90deg, transparent, #C9A84C, transparent)",
-                    }}
-                  />
-                  <div
-                    style={{
-                      padding: "12px 16px",
-                      borderBottom: "1px solid rgba(201,168,76,0.08)",
-                    }}
-                  >
-                    <p
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: "white",
-                        margin: 0,
-                      }}
-                    >
+                <div className="absolute right-0 top-11 z-50 w-72 overflow-hidden rounded-2xl border border-[#C9A84C]/20 bg-[#0C1E38] shadow-[0_16px_40px_rgba(0,0,0,0.5)]">
+                  <div className="h-px bg-[linear-gradient(90deg,transparent,#C9A84C,transparent)]" />
+                  <div className="border-b border-[#C9A84C]/10 px-4 py-3">
+                    <p className="m-0 text-sm font-bold text-white">
                       Notifications
                     </p>
-                    <p
-                      style={{
-                        fontSize: 11,
-                        color: "#3D5A70",
-                        margin: "2px 0 0",
-                      }}
-                    >
+                    <p className="mt-0.5 text-xs text-[#3D5A70]">
                       1 new message
                     </p>
                   </div>
-                  <div style={{ padding: 12 }}>
-                    {notifications.map((n) => (
+                  <div className="p-3">
+                    {notifications.map((notification) => (
                       <div
-                        key={n.id}
-                        style={{
-                          padding: "10px 12px",
-                          borderRadius: 10,
-                          background: "rgba(201,168,76,0.05)",
-                          border: "1px solid rgba(201,168,76,0.1)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                        }}
+                        key={notification.id}
+                        className="flex items-center justify-between rounded-xl border border-[#C9A84C]/10 bg-[#C9A84C]/5 px-3 py-2.5"
                       >
-                        <p
-                          style={{ fontSize: 13, color: "#C5CDD6", margin: 0 }}
-                        >
-                          {n.message}
+                        <p className="m-0 text-sm text-[#C5CDD6]">
+                          {notification.message}
                         </p>
-                        {!n.read && (
-                          <span
-                            style={{
-                              width: 7,
-                              height: 7,
-                              borderRadius: "50%",
-                              background: "#4ADE80",
-                              flexShrink: 0,
-                            }}
-                          />
+                        {!notification.read && (
+                          <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-400" />
                         )}
                       </div>
                     ))}
                   </div>
-                  <div
-                    style={{
-                      padding: "10px 16px",
-                      borderTop: "1px solid rgba(201,168,76,0.08)",
-                    }}
-                  >
+                  <div className="border-t border-[#C9A84C]/10 px-4 py-2.5">
                     <button
+                      type="button"
                       onClick={() => setShowNotifications(false)}
-                      style={{
-                        width: "100%",
-                        fontSize: 12,
-                        color: "#3D5A70",
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        fontWeight: 600,
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.color = "#C9A84C")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.color = "#3D5A70")
-                      }
+                      className="w-full border-0 bg-transparent text-xs font-semibold text-[#3D5A70] transition hover:text-[#C9A84C]"
                     >
                       Close
                     </button>
@@ -559,133 +341,33 @@ const UserDashboard = () => {
             </div>
           </div>
 
-          {/* Balance */}
-          <div style={{ marginBottom: 24 }}>
-            <p
-              style={{
-                fontSize: 11,
-                fontWeight: 600,
-                color: "#3D5A70",
-                textTransform: "uppercase",
-                letterSpacing: "0.15em",
-                marginBottom: 6,
-              }}
-            >
+          <div className="mb-6">
+            <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.15em] text-[#3D5A70]">
               Total Portfolio Balance
             </p>
-            <p
-              style={{
-                fontSize: "clamp(2rem,6vw,2.8rem)",
-                fontWeight: 900,
-                color: "white",
-                letterSpacing: "-0.03em",
-                margin: "0 0 4px",
-                lineHeight: 1,
-              }}
-            >
+            <p className="m-0 text-[clamp(2rem,6vw,2.8rem)] font-black leading-none tracking-[-0.03em] text-white">
               {formatCurrency(totalBalance)}
             </p>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                marginTop: 6,
-              }}
-            >
-              <span
-                style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: "50%",
-                  background: "#C9A84C",
-                  animation: "pulse 2s infinite",
-                }}
-              />
-              <span
-                style={{
-                  fontSize: 11,
-                  color: "#C9A84C",
-                  fontWeight: 600,
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                }}
-              >
+            <div className="mt-2 flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#C9A84C]" />
+              <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#C9A84C]">
                 Quantum-Secured · Live
               </span>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* ── Action buttons (outside card) ── */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4,1fr)",
-          gap: 8,
-          marginBottom: 24,
-        }}
-      >
-        {actionButtons.map(({ to, icon: Icon, label }) => (
-          <Link
-            key={label}
-            to={to}
-            style={{ textDecoration: "none" }}
-            onMouseEnter={(e) => {
-              e.currentTarget.querySelector(".ab-wrap").style.borderColor =
-                "rgba(201,168,76,0.4)";
-              e.currentTarget.querySelector(".ab-wrap").style.background =
-                "rgba(201,168,76,0.08)";
-              e.currentTarget.querySelector(".ab-wrap").style.boxShadow =
-                "0 4px 16px rgba(201,168,76,0.1)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.querySelector(".ab-wrap").style.borderColor =
-                "rgba(201,168,76,0.2)";
-              e.currentTarget.querySelector(".ab-wrap").style.background =
-                "rgba(201,168,76,0.04)";
-              e.currentTarget.querySelector(".ab-wrap").style.boxShadow =
-                "none";
-            }}
-          >
-            <div
-              className="ab-wrap"
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "16px 12px",
-                borderRadius: 14,
-                background: "rgba(201,168,76,0.04)",
-                border: "1px solid rgba(201,168,76,0.2)",
-                transition: "all 0.2s",
-                gap: 8,
-              }}
-            >
-              <div
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 10,
-                  background: "rgba(201,168,76,0.08)",
-                  border: "1px solid rgba(201,168,76,0.25)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Icon style={{ width: 18, height: 18, color: "#C9A84C" }} />
+      <div className="mb-6 grid grid-cols-4 gap-2">
+        {actionButtons.map(({ to, icon, label }) => (
+          <Link key={label} to={to} className="group no-underline">
+            <div className="flex flex-col items-center justify-center gap-2 rounded-[14px] border border-[#C9A84C]/20 bg-[#C9A84C]/5 px-3 py-4 transition-all group-hover:border-[#C9A84C]/40 group-hover:bg-[#C9A84C]/10 group-hover:shadow-[0_4px_16px_rgba(201,168,76,0.10)]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-[#C9A84C]/25 bg-[#C9A84C]/10">
+                {React.createElement(icon, {
+                  className: "h-[18px] w-[18px] text-[#C9A84C]",
+                })}
               </div>
-              <span
-                style={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: "#8EB1CE",
-                  textAlign: "center",
-                }}
-              >
+              <span className="text-center text-xs font-semibold text-[#8EB1CE]">
                 {label}
               </span>
             </div>
@@ -693,246 +375,85 @@ const UserDashboard = () => {
         ))}
       </div>
 
-      {/* ── Assets section ── */}
-      <div
-        style={{
-          borderRadius: 20,
-          overflow: "hidden",
-          background: "linear-gradient(160deg, #0C1C36 0%, #070F1C 100%)",
-          border: "1px solid rgba(201,168,76,0.12)",
-          marginBottom: 24,
-        }}
-      >
-        {/* Top hairline */}
-        <div
-          style={{
-            height: 1,
-            background:
-              "linear-gradient(90deg, transparent, rgba(201,168,76,0.4), transparent)",
-          }}
-        />
-
-        {/* Header */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "1rem 1.25rem",
-            borderBottom: "1px solid rgba(201,168,76,0.07)",
-          }}
-        >
+      <section className="mb-6 overflow-hidden rounded-[20px] border border-[#C9A84C]/10 bg-[linear-gradient(160deg,#0C1C36_0%,#070F1C_100%)]">
+        <div className="h-px bg-[linear-gradient(90deg,transparent,rgba(201,168,76,0.4),transparent)]" />
+        <div className="flex items-center justify-between border-b border-[#C9A84C]/10 px-5 py-4">
           <div>
-            <p
-              style={{
-                fontSize: 14,
-                fontWeight: 700,
-                color: "white",
-                margin: 0,
-              }}
-            >
-              Your Assets
-            </p>
-            <p style={{ fontSize: 11, color: "#3D5A70", margin: "2px 0 0" }}>
+            <p className="m-0 text-sm font-bold text-white">Your Assets</p>
+            <p className="mt-0.5 text-[11px] text-[#3D5A70]">
               {sortedTokens.length} tokens
             </p>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span
-              style={{
-                width: 6,
-                height: 6,
-                borderRadius: "50%",
-                background: "#C9A84C",
-              }}
-            />
-            <span
-              style={{
-                fontSize: 10,
-                color: "#3D5A70",
-                fontWeight: 600,
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-              }}
-            >
+          <div className="flex items-center gap-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#C9A84C]" />
+            <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#3D5A70]">
               Live prices
             </span>
           </div>
         </div>
 
-        {/* Token list */}
-        <div style={{ padding: "0.75rem" }}>
+        <div className="p-3">
           {sortedTokens.map(({ token, usdBalance, tokenAmount, price }) => (
             <div
               key={token}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "12px 14px",
-                borderRadius: 14,
-                marginBottom: 6,
-                border: "1px solid rgba(201,168,76,0.05)",
-                background: "rgba(201,168,76,0.015)",
-                transition: "all 0.2s",
-                cursor: "default",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(201,168,76,0.05)";
-                e.currentTarget.style.borderColor = "rgba(201,168,76,0.18)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(201,168,76,0.015)";
-                e.currentTarget.style.borderColor = "rgba(201,168,76,0.05)";
-              }}
+              className="mb-1.5 flex items-center justify-between rounded-[14px] border border-[#C9A84C]/5 bg-[#C9A84C]/[0.015] px-3.5 py-3 transition-all hover:border-[#C9A84C]/20 hover:bg-[#C9A84C]/5"
             >
-              {/* Left: Logo + name */}
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: "50%",
-                    border: "1px solid rgba(201,168,76,0.15)",
-                    overflow: "hidden",
-                    background: "#04090F",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                  }}
-                >
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#C9A84C]/15 bg-[#04090F]">
                   {tokenLogos[token] ? (
                     <img
                       src={tokenLogos[token]}
                       alt={token}
-                      style={{ width: 32, height: 32, objectFit: "contain" }}
+                      className="h-8 w-8 object-contain"
                     />
                   ) : (
-                    <span
-                      style={{
-                        fontSize: 14,
-                        fontWeight: 800,
-                        color: "#C9A84C",
-                      }}
-                    >
+                    <span className="text-sm font-extrabold text-[#C9A84C]">
                       {tokenSymbols[token]?.[0]}
                     </span>
                   )}
                 </div>
                 <div>
-                  <p
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 700,
-                      color: "white",
-                      margin: 0,
-                    }}
-                  >
+                  <p className="m-0 text-sm font-bold text-white">
                     {tokenDisplayNames[token]}
                   </p>
-                  <p
-                    style={{
-                      fontSize: 11,
-                      color: "#3D5A70",
-                      margin: "2px 0 0",
-                      tabularNums: true,
-                    }}
-                  >
+                  <p className="mt-0.5 text-[11px] tabular-nums text-[#3D5A70]">
                     {tokenAmount}{" "}
-                    <span style={{ color: "#2E4A60" }}>
+                    <span className="text-[#2E4A60]">
                       {tokenSymbols[token]}
                     </span>
                   </p>
                 </div>
               </div>
 
-              {/* Right: Values */}
-              <div style={{ textAlign: "right" }}>
-                <p
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 700,
-                    color: "white",
-                    margin: 0,
-                    fontVariantNumeric: "tabular-nums",
-                  }}
-                >
+              <div className="text-right">
+                <p className="m-0 text-sm font-bold tabular-nums text-white">
                   {formatCurrency(usdBalance)}
                 </p>
-                <p
-                  style={{
-                    fontSize: 11,
-                    color: "#3D5A70",
-                    margin: "2px 0 0",
-                    fontVariantNumeric: "tabular-nums",
-                  }}
-                >
+                <p className="mt-0.5 text-[11px] tabular-nums text-[#3D5A70]">
                   {price > 0 ? formatCurrency(price) : "—"}
                 </p>
-                <div
-                  style={{
-                    display: "inline-block",
-                    marginTop: 4,
-                    padding: "2px 8px",
-                    borderRadius: 999,
-                    background:
-                      usdBalance > 0
-                        ? "rgba(74,222,128,0.08)"
-                        : "rgba(201,168,76,0.05)",
-                    border: `1px solid ${usdBalance > 0 ? "rgba(74,222,128,0.2)" : "rgba(201,168,76,0.08)"}`,
-                  }}
+                <span
+                  className={`mt-1 inline-flex rounded-full border px-2 py-0.5 text-[10px] font-bold ${
+                    usdBalance > 0
+                      ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-400"
+                      : "border-[#C9A84C]/10 bg-[#C9A84C]/5 text-[#2E4A60]"
+                  }`}
                 >
-                  <span
-                    style={{
-                      fontSize: 10,
-                      fontWeight: 700,
-                      color: usdBalance > 0 ? "#4ADE80" : "#2E4A60",
-                    }}
-                  >
-                    {usdBalance > 0 ? "Active" : "Empty"}
-                  </span>
-                </div>
+                  {usdBalance > 0 ? "Active" : "Empty"}
+                </span>
               </div>
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* ── Security info banner ── */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "flex-start",
-          gap: 12,
-          padding: "14px 16px",
-          borderRadius: 14,
-          marginBottom: 80,
-          background: "rgba(201,168,76,0.04)",
-          border: "1px solid rgba(201,168,76,0.1)",
-        }}
-      >
-        <ShieldCheckIcon
-          style={{
-            width: 18,
-            height: 18,
-            color: "#C9A84C",
-            flexShrink: 0,
-            marginTop: 1,
-          }}
-        />
-        <p
-          style={{ fontSize: 12, color: "#3D5A70", margin: 0, lineHeight: 1.6 }}
-        >
+      <div className="mb-20 flex items-start gap-3 rounded-[14px] border border-[#C9A84C]/10 bg-[#C9A84C]/5 px-4 py-3.5">
+        <ShieldCheckIcon className="mt-0.5 h-[18px] w-[18px] shrink-0 text-[#C9A84C]" />
+        <p className="m-0 text-xs leading-5 text-[#3D5A70]">
           All assets are protected by quantum-resistant encryption and FRA fund
           recovery system. Prices update every 5 hours.
         </p>
       </div>
-
-      <style>{`
-        @keyframes spin  { to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
-      `}</style>
     </>
   );
 };

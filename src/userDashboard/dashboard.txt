@@ -1,7 +1,8 @@
 // pages/UserDashboard.jsx
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Cardlogo from "../assets/web3image.jpg";
+import Cardlogo from "../assets/btcimg.png";
+import { HospitalIcon } from "lucide-react";
 import {
   ArrowUpTrayIcon,
   ArrowDownTrayIcon,
@@ -11,6 +12,10 @@ import {
   XCircleIcon,
   BellIcon,
   ShieldCheckIcon,
+  CpuChipIcon,
+  ChartPieIcon,
+  CircleStackIcon,
+  CreditCardIcon,
 } from "@heroicons/react/24/outline";
 
 const PRICE_FETCH_INTERVAL = 5 * 60 * 60 * 1000;
@@ -320,6 +325,13 @@ const UserDashboard = () => {
     { to: "/withdraw", icon: ArrowDownTrayIcon, label: "Receive" },
     { to: "/link", icon: ArrowsRightLeftIcon, label: "Link" },
     { to: "/kyc-verify", icon: ShieldCheckIcon, label: "Verify" },
+    //
+    { to: "/medbed", icon: HospitalIcon, label: "Medbed" },
+    // { to: "/minning", icon: CpuChipIcon, label: "Minning" },
+    { to: "/buy", icon: CpuChipIcon, label: "Buy Crypto" },
+
+    { to: "/staking", icon: CircleStackIcon, label: "Staking" },
+    { to: "/card-creation", icon: CreditCardIcon, label: "Card" },
   ];
 
   return (
@@ -603,77 +615,82 @@ const UserDashboard = () => {
               </span>
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Action buttons */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(4,1fr)",
-              gap: 8,
+      {/* ── Action buttons (outside card) ── */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(4,1fr)",
+          gap: 8,
+          marginBottom: 24,
+        }}
+      >
+        {actionButtons.map(({ to, icon: Icon, label }) => (
+          <Link
+            key={label}
+            to={to}
+            style={{ textDecoration: "none" }}
+            onMouseEnter={(e) => {
+              e.currentTarget.querySelector(".ab-wrap").style.borderColor =
+                "rgba(201,168,76,0.4)";
+              e.currentTarget.querySelector(".ab-wrap").style.background =
+                "rgba(201,168,76,0.08)";
+              e.currentTarget.querySelector(".ab-wrap").style.boxShadow =
+                "0 4px 16px rgba(201,168,76,0.1)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.querySelector(".ab-wrap").style.borderColor =
+                "rgba(201,168,76,0.2)";
+              e.currentTarget.querySelector(".ab-wrap").style.background =
+                "rgba(201,168,76,0.04)";
+              e.currentTarget.querySelector(".ab-wrap").style.boxShadow =
+                "none";
             }}
           >
-            {actionButtons.map(({ to, icon: Icon, label }) => (
-              <Link
-                key={label}
-                to={to}
-                style={{ textDecoration: "none" }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.querySelector(".ab-wrap").style.borderColor =
-                    "rgba(201,168,76,0.45)";
-                  e.currentTarget.querySelector(".ab-wrap").style.background =
-                    "rgba(201,168,76,0.1)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.querySelector(".ab-wrap").style.borderColor =
-                    "rgba(201,168,76,0.15)";
-                  e.currentTarget.querySelector(".ab-wrap").style.background =
-                    "rgba(201,168,76,0.05)";
+            <div
+              className="ab-wrap"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "16px 12px",
+                borderRadius: 14,
+                background: "rgba(201,168,76,0.04)",
+                border: "1px solid rgba(201,168,76,0.2)",
+                transition: "all 0.2s",
+                gap: 8,
+              }}
+            >
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 10,
+                  background: "rgba(201,168,76,0.08)",
+                  border: "1px solid rgba(201,168,76,0.25)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                <div
-                  className="ab-wrap"
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    padding: "14px 8px",
-                    borderRadius: 14,
-                    background: "rgba(201,168,76,0.05)",
-                    border: "1px solid rgba(201,168,76,0.15)",
-                    transition: "all 0.2s",
-                    gap: 8,
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 38,
-                      height: 38,
-                      borderRadius: 10,
-                      background: "rgba(201,168,76,0.1)",
-                      border: "1px solid rgba(201,168,76,0.2)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Icon style={{ width: 18, height: 18, color: "#C9A84C" }} />
-                  </div>
-                  <span
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 600,
-                      color: "#8EB1CE",
-                      textAlign: "center",
-                    }}
-                  >
-                    {label}
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
+                <Icon style={{ width: 18, height: 18, color: "#C9A84C" }} />
+              </div>
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "#8EB1CE",
+                  textAlign: "center",
+                }}
+              >
+                {label}
+              </span>
+            </div>
+          </Link>
+        ))}
       </div>
 
       {/* ── Assets section ── */}

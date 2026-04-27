@@ -17,7 +17,6 @@ import {
   PhoneIcon,
   GlobeAltIcon,
 } from "@heroicons/react/24/outline";
-import CardLogo from "../assets/btcimg.png";
 
 // ── QFS Logo (same as rest of dashboard) ──
 const QFSLogo = ({ size = 44 }) => (
@@ -178,7 +177,6 @@ const Account = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchUserData();
@@ -201,12 +199,11 @@ const Account = () => {
       const data = await res.json();
       if (res.ok && data.success) {
         setUserData(data.data.user);
-        setError("");
       } else {
-        setError(data.message || "Failed to fetch account data");
+        console.error(data.message || "Failed to fetch account data");
       }
-    } catch {
-      setError("Network error. Please try again.");
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -301,23 +298,53 @@ const Account = () => {
           boxShadow: "0 0 50px rgba(201,168,76,0.08)",
         }}
       >
-        {/* BG image */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage: `url(${CardLogo})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        />
-        {/* Overlay */}
+        {/* Built-in profile card background */}
         <div
           style={{
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(135deg, rgba(4,9,15,0.72) 0%, rgba(12,30,56,0.65) 100%)",
+              "radial-gradient(circle at 18% 16%, rgba(240,192,64,0.28), transparent 30%), radial-gradient(circle at 85% 18%, rgba(56,189,248,0.12), transparent 28%), linear-gradient(135deg, #04090F 0%, #0C1E38 52%, #07111F 100%)",
+          }}
+        />
+        {/* Glass highlight */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(120deg, rgba(255,255,255,0.12), transparent 30%, rgba(201,168,76,0.1) 72%, transparent)",
+            opacity: 0.85,
+          }}
+        />
+        {/* Subtle grid */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            pointerEvents: "none",
+            opacity: 0.08,
+            zIndex: 1,
+            backgroundImage:
+              "linear-gradient(rgba(201,168,76,0.16) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.12) 1px, transparent 1px)",
+            backgroundSize: "34px 34px",
+            maskImage:
+              "linear-gradient(135deg, rgba(0,0,0,0.8), transparent 72%)",
+          }}
+        />
+        {/* Decorative arc */}
+        <div
+          style={{
+            position: "absolute",
+            right: -68,
+            bottom: -92,
+            width: 210,
+            height: 210,
+            borderRadius: "50%",
+            border: "1px solid rgba(201,168,76,0.16)",
+            boxShadow:
+              "inset 0 0 0 26px rgba(201,168,76,0.025), inset 0 0 0 52px rgba(201,168,76,0.02)",
+            zIndex: 1,
           }}
         />
         {/* Top hairline */}
@@ -446,7 +473,7 @@ const Account = () => {
         >
           <div style={{ display: "flex", gap: 10, width: "max-content" }}>
             {walletActions.map(
-              ({ to, href, icon: Icon, label, sub, kyc: isKyc, external }) => {
+              ({ to, href, icon, label, sub, kyc: isKyc, external }) => {
                 const iconColor = isKyc
                   ? getKyc(userData?.kycStatus).color
                   : "#C9A84C";
@@ -499,9 +526,9 @@ const Account = () => {
                         border: `1px solid ${iconBorder}`,
                       }}
                     >
-                      <Icon
-                        style={{ width: 22, height: 22, color: iconColor }}
-                      />
+                      {React.createElement(icon, {
+                        style: { width: 22, height: 22, color: iconColor },
+                      })}
                     </div>
                     <div>
                       <p
@@ -779,7 +806,7 @@ const Account = () => {
                 label: "Country",
                 value: userData?.country || "—",
               },
-            ].map(({ icon: Icon, label, value }) => (
+            ].map(({ icon, label, value }) => (
               <div
                 key={label}
                 style={{
@@ -805,7 +832,9 @@ const Account = () => {
                     flexShrink: 0,
                   }}
                 >
-                  <Icon style={{ width: 15, height: 15, color: "#C9A84C" }} />
+                  {React.createElement(icon, {
+                    style: { width: 15, height: 15, color: "#C9A84C" },
+                  })}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p
