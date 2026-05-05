@@ -85,19 +85,20 @@ const Hero = () => {
             >
               <h1
                 className="font-black leading-[1.05] tracking-tight"
-                style={{ fontSize: "clamp(2.6rem, 4.5vw, 4rem)" }}
+                style={{ fontSize: "clamp(2.25rem, 4.5vw, 4rem)" }}
               >
-                <span className="block text-white">Web3</span>
-                <span
-                  className="block mt-1"
-                  style={{
-                    background:
-                      "linear-gradient(90deg, #C9A84C 0%, #F0C040 50%, #C9A84C 100%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                  }}
-                >
-                  Ledger
+                <span className="block whitespace-nowrap">
+                  <span className="text-white">Web3</span>{" "}
+                  <span
+                    style={{
+                      background:
+                        "linear-gradient(90deg, #C9A84C 0%, #F0C040 50%, #C9A84C 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                    }}
+                  >
+                    Ledger
+                  </span>
                 </span>
                 <span className="block text-[#7A9CBE] text-2xl font-light tracking-normal mt-3">
                   Wallets · Digital Assets · Blockchain
