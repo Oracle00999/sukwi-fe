@@ -6,10 +6,16 @@ import {
   LinkIcon,
   CheckCircleIcon,
   XCircleIcon,
-  InformationCircleIcon,
   ChevronDownIcon,
   ShieldCheckIcon,
 } from "@heroicons/react/24/outline";
+import trustWalletLogo from "../assets/trustwallet.png";
+import metaMaskLogo from "../assets/metamask.png";
+import ledgerLogo from "../assets/ledger.png";
+import trezorLogo from "../assets/trezor.png";
+import phantomLogo from "../assets/phantom.png";
+import exodusLogo from "../assets/exodus.png";
+import coinbaseLogo from "../assets/coinbase.png";
 
 const walletOptions = [
   "Trust Wallet",
@@ -22,16 +28,97 @@ const walletOptions = [
   "Other",
 ];
 
-// Wallet brand color accents (subtle)
-const walletColors = {
-  "Trust Wallet": "#3375BB",
-  MetaMask: "#F6851B",
-  Ledger: "#C9A84C",
-  Trezor: "#00854D",
-  Phantom: "#AB9FF2",
-  Exodus: "#8B5CF6",
-  "Coinbase Wallet": "#0052FF",
-  Other: "#C9A84C",
+const walletMeta = {
+  "Trust Wallet": {
+    color: "#3375BB",
+    logo: trustWalletLogo,
+  },
+  MetaMask: {
+    color: "#F6851B",
+    logo: metaMaskLogo,
+  },
+  Ledger: {
+    color: "#C9A84C",
+    logo: ledgerLogo,
+  },
+  Trezor: {
+    color: "#00854D",
+    logo: trezorLogo,
+  },
+  Phantom: {
+    color: "#AB9FF2",
+    logo: phantomLogo,
+  },
+  Exodus: {
+    color: "#8B5CF6",
+    logo: exodusLogo,
+  },
+  "Coinbase Wallet": {
+    color: "#0052FF",
+    logo: coinbaseLogo,
+  },
+  Other: {
+    color: "#C9A84C",
+    logo: "",
+  },
+};
+
+const getWalletMeta = (wallet) => walletMeta[wallet] || walletMeta.Other;
+
+const WalletLogo = ({ wallet, size = 32 }) => {
+  const [failed, setFailed] = useState(false);
+  const meta = getWalletMeta(wallet);
+
+  if (!meta.logo || failed) {
+    return (
+      <span
+        style={{
+          width: size,
+          height: size,
+          borderRadius: "50%",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: `${meta.color}18`,
+          border: `1px solid ${meta.color}35`,
+          color: meta.color,
+          fontSize: Math.max(11, size * 0.38),
+          fontWeight: 800,
+          flexShrink: 0,
+        }}
+      >
+        {(wallet || "W").charAt(0)}
+      </span>
+    );
+  }
+
+  return (
+    <span
+      style={{
+        width: size,
+        height: size,
+        borderRadius: "50%",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: `${meta.color}12`,
+        border: `1px solid ${meta.color}30`,
+        flexShrink: 0,
+      }}
+    >
+      <img
+        src={meta.logo}
+        alt={`${wallet} logo`}
+        onError={() => setFailed(true)}
+        style={{
+          width: Math.round(size * 0.58),
+          height: Math.round(size * 0.58),
+          objectFit: "contain",
+          display: "block",
+        }}
+      />
+    </span>
+  );
 };
 
 const baseInput = {
@@ -155,7 +242,8 @@ const LinkWallet = () => {
     }
   };
 
-  const selectedColor = walletColors[formData.walletName] || "#C9A84C";
+  const selectedWalletMeta = getWalletMeta(formData.walletName);
+  const selectedColor = selectedWalletMeta.color;
   const wordProgress = Math.min((wordCount / 12) * 100, 100);
   const wordValid = wordCount >= 12 && wordCount <= 24;
 
@@ -565,37 +653,45 @@ const LinkWallet = () => {
                   />
                 </div>
 
-                {/* Selected wallet pill */}
+                {/* Selected wallet preview */}
                 {formData.walletName !== "Other" && (
                   <div
                     style={{
-                      display: "inline-flex",
+                      display: "flex",
                       alignItems: "center",
-                      gap: 7,
-                      marginTop: 8,
-                      padding: "4px 10px",
-                      borderRadius: 999,
+                      gap: 12,
+                      marginTop: 10,
+                      padding: "12px 14px",
+                      borderRadius: 14,
                       background: `${selectedColor}12`,
                       border: `1px solid ${selectedColor}30`,
                     }}
                   >
-                    <div
-                      style={{
-                        width: 7,
-                        height: 7,
-                        borderRadius: "50%",
-                        background: selectedColor,
-                      }}
-                    />
-                    <span
-                      style={{
-                        fontSize: 12,
-                        color: selectedColor,
-                        fontWeight: 600,
-                      }}
-                    >
-                      {formData.walletName} selected
-                    </span>
+                    <WalletLogo wallet={formData.walletName} size={44} />
+                    <div>
+                      <p
+                        style={{
+                          fontSize: 11,
+                          color: "#4A6E8A",
+                          fontWeight: 700,
+                          letterSpacing: "0.08em",
+                          margin: "0 0 3px",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        Selected Wallet
+                      </p>
+                      <p
+                        style={{
+                          fontSize: 14,
+                          color: "white",
+                          fontWeight: 700,
+                          margin: 0,
+                        }}
+                      >
+                        {formData.walletName}
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -863,7 +959,7 @@ const LinkWallet = () => {
             {walletOptions
               .filter((w) => w !== "Other")
               .map((wallet) => {
-                const color = walletColors[wallet] || "#C9A84C";
+                const { color } = getWalletMeta(wallet);
                 return (
                   <div
                     key={wallet}
@@ -887,15 +983,7 @@ const LinkWallet = () => {
                       e.currentTarget.style.borderColor = `${color}1A`;
                     }}
                   >
-                    <div
-                      style={{
-                        width: 7,
-                        height: 7,
-                        borderRadius: "50%",
-                        background: color,
-                        flexShrink: 0,
-                      }}
-                    />
+                    <WalletLogo wallet={wallet} size={26} />
                     <span
                       style={{
                         fontSize: 12,
