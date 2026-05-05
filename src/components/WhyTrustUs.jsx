@@ -13,44 +13,44 @@ import { motion } from "framer-motion";
 const trustPoints = [
   {
     icon: ShieldCheckIcon,
-    title: "Quantum-Resistant Security",
+    title: "Wallet-First Security",
     description:
-      "Built with post-quantum cryptography that remains secure against future quantum computing threats.",
+      "Protect accounts, keys, and connected wallets with layered security controls built for digital assets.",
     index: "01",
   },
   {
     icon: LockClosedIcon,
-    title: "Military-Grade Encryption",
+    title: "Private By Design",
     description:
-      "256-bit encryption and zero-knowledge proofs ensure your data stays private and secure.",
+      "Encryption, secure sessions, and careful access controls help keep sensitive account data private.",
     index: "02",
   },
   {
     icon: BanknotesIcon,
-    title: "FRA Protected",
+    title: "Digital Asset Protection",
     description:
-      "Funds Retrieving Agent ensures asset recovery during financial system transitions.",
+      "Manage crypto balances, transfers, and wallet activity from a trusted Web3 ledger experience.",
     index: "03",
   },
   {
     icon: GlobeAltIcon,
-    title: "Global Compliance",
+    title: "Multi-Chain Ready",
     description:
-      "Designed to meet international financial regulations and ISO 20022 standards.",
+      "Built for modern blockchain networks, tokenized assets, and borderless digital finance workflows.",
     index: "04",
   },
   {
     icon: ClockIcon,
-    title: "24/7 Monitoring",
+    title: "Real-Time Monitoring",
     description:
-      "Round-the-clock system monitoring and instant threat detection response.",
+      "Track wallet activity, transactions, and account updates with always-on visibility.",
     index: "05",
   },
   {
     icon: UserGroupIcon,
-    title: "Expert Team",
+    title: "Web3 Support",
     description:
-      "Backed by financial cryptographers and quantum computing specialists.",
+      "Guidance for onboarding, wallet setup, digital asset management, and account security.",
     index: "06",
   },
 ];
@@ -117,7 +117,7 @@ const WhyTrustUs = () => {
             </span>
           </div>
 
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 max-w-4xl">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <h2
               className="font-black leading-[1.05] tracking-tight"
               style={{ fontSize: "clamp(2rem, 3.5vw, 3rem)" }}
@@ -130,14 +130,18 @@ const WhyTrustUs = () => {
                   WebkitTextFillColor: "transparent",
                 }}
               >
-                Web3Global Ledger
+                Web3 Ledger
               </span>
             </h2>
             <p
-              className="text-base leading-relaxed md:text-right max-w-xs"
-              style={{ color: "#5A7A96" }}
+              className="text-base leading-relaxed max-w-md md:max-w-sm md:ml-auto md:pl-6"
+              style={{
+                color: "#5A7A96",
+                borderLeft: "1px solid rgba(201,168,76,0.18)",
+              }}
             >
-              Built on transparency, security, and proven quantum technology.
+              Built for secure wallets, transparent activity, and modern
+              blockchain finance.
             </p>
           </div>
         </motion.div>
@@ -265,7 +269,7 @@ const WhyTrustUs = () => {
           </div>
 
           <div className="flex items-center gap-6">
-            {["ISO 20022", "Post-Quantum", "Zero-Knowledge"].map((badge) => (
+            {["Multi-Chain", "Wallet Security", "On-Chain Ready"].map((badge) => (
               <span
                 key={badge}
                 className="text-xs font-medium px-3 py-1.5 rounded-lg"

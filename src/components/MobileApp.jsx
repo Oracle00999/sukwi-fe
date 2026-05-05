@@ -106,8 +106,9 @@ const MobileApp = () => {
             className="text-base leading-relaxed max-w-md mx-auto"
             style={{ color: "#5A7A96" }}
           >
-            Our mobile app is in development. Manage your quantum-secure assets
-            on iOS and Android — coming soon.
+            Our mobile app is in development. Manage wallets, track digital
+            assets, and review blockchain activity on iOS and Android — coming
+            soon.
           </p>
         </motion.div>
 
@@ -207,9 +208,9 @@ const MobileApp = () => {
             }}
           >
             {[
-              { label: "Real-time prices", sub: "Live market data" },
-              { label: "Instant transfers", sub: "Send & receive 24/7" },
-              { label: "Biometric security", sub: "Face ID & fingerprint" },
+              { label: "Token tracking", sub: "Wallet balances" },
+              { label: "Fast transfers", sub: "Send & receive 24/7" },
+              { label: "Secure access", sub: "Face ID & fingerprint" },
             ].map((feat, i) => (
               <div
                 key={i}

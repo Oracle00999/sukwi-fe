@@ -2,8 +2,8 @@
 import React, { useState } from "react";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
 
-// ── Same QFS logo used across the site ──
-const QFSLogo = ({ size = 36 }) => (
+// ── Web3 Ledger Logo: WL monogram with circuit detail ──
+const Web3LedgerLogo = ({ size = 36 }) => (
   <svg
     width={size}
     height={size}
@@ -12,67 +12,40 @@ const QFSLogo = ({ size = 36 }) => (
     xmlns="http://www.w3.org/2000/svg"
   >
     <defs>
-      <linearGradient
-        id="unBorder"
-        x1="0"
-        y1="0"
-        x2="60"
-        y2="60"
-        gradientUnits="userSpaceOnUse"
-      >
-        <stop offset="0%" stopColor="#C9A84C" />
-        <stop offset="100%" stopColor="#F0C040" />
-      </linearGradient>
-      <linearGradient id="unChip" x1="0" y1="0" x2="1" y2="1">
+      <linearGradient id="userNavWeb3LedgerGold" x1="8" y1="8" x2="52" y2="52">
         <stop offset="0%" stopColor="#F0C040" />
         <stop offset="100%" stopColor="#C9A84C" />
       </linearGradient>
+      <linearGradient id="userNavWeb3LedgerCyan" x1="12" y1="12" x2="48" y2="48">
+        <stop offset="0%" stopColor="#5CE1E6" />
+        <stop offset="100%" stopColor="#8EB1CE" />
+      </linearGradient>
     </defs>
-    <rect
-      x="1.5"
-      y="1.5"
-      width="57"
-      height="57"
-      rx="14"
-      fill="#07111F"
-      stroke="url(#unBorder)"
-      strokeWidth="1.5"
+    <rect x="4" y="4" width="52" height="52" rx="14" fill="transparent" />
+    <path
+      d="M12 16H22L26 38L31 21L36 38L41 16H48"
+      stroke="url(#userNavWeb3LedgerGold)"
+      strokeWidth="5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
-    <rect
-      x="5"
-      y="5"
-      width="50"
-      height="50"
-      rx="11"
-      fill="none"
-      stroke="rgba(201,168,76,0.08)"
-      strokeWidth="0.75"
+    <path
+      d="M42 18V42H51"
+      stroke="#F7E4A5"
+      strokeWidth="5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
-    <text
-      x="25"
-      y="43"
-      fontSize="38"
-      fontWeight="900"
-      fontFamily="system-ui,-apple-system,sans-serif"
-      fill="#F0C040"
-      textAnchor="middle"
-      letterSpacing="-1"
-    >
-      Q
-    </text>
-    <rect x="35" y="36" width="19" height="15" rx="4" fill="url(#unChip)" />
-    <text
-      x="44.5"
-      y="47"
-      fontSize="9"
-      fontWeight="800"
-      fontFamily="system-ui,-apple-system,sans-serif"
-      fill="#07111F"
-      textAnchor="middle"
-      letterSpacing="0.5"
-    >
-      FS
-    </text>
+    <path
+      d="M15 45H27M27 45V39M47 14H53M53 14V21M13 23H7M7 23V31"
+      stroke="url(#userNavWeb3LedgerCyan)"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle cx="27" cy="45" r="2.4" fill="#5CE1E6" />
+    <circle cx="53" cy="21" r="2.4" fill="#5CE1E6" />
+    <circle cx="7" cy="31" r="2.4" fill="#5CE1E6" />
   </svg>
 );
 
@@ -133,9 +106,9 @@ const UserNav = () => {
           {/* ── Left: Logo + wordmark ── */}
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div
-              style={{ filter: "drop-shadow(0 0 6px rgba(201,168,76,0.3))" }}
+              style={{ filter: "drop-shadow(0 0 5px rgba(201,168,76,0.18))" }}
             >
-              <QFSLogo size={36} />
+              <Web3LedgerLogo size={36} />
             </div>
             {/* <div
               style={{

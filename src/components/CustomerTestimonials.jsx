@@ -6,30 +6,30 @@ import { motion } from "framer-motion";
 const testimonials = [
   {
     id: 1,
-    text: "QFS = Quantum Financial System is the future. Withdraw funds from banks and secure them in QFS-backed assets like XLM and XRP before it's too late!",
+    text: "Web3 Ledger made it easier for me to see my wallet activity, track digital assets, and manage transfers from one clean dashboard.",
     author: "Michael R.",
-    role: "Early Investor",
+    role: "Digital Asset Holder",
     rating: 5,
   },
   {
     id: 2,
-    text: "XRP is a HOLD crypto. Red days are buying opportunities! Soon, higher prices will be the norm. HOLD until new tax codes pass—this is the future of finance!",
+    text: "The platform feels simple without feeling basic. I can review balances, follow transaction activity, and keep my crypto workflow organized.",
     author: "Sarah L.",
-    role: "Crypto Trader",
+    role: "Web3 Investor",
     rating: 5,
   },
   {
     id: 3,
-    text: "Switching to the Quantum Financial System (QFS) by securing funds in XLM and XRP is the best decision. The banking system has never been honest with us!",
+    text: "I wanted a more professional way to manage token activity. Web3 Ledger gives me the visibility and security cues I was missing.",
     author: "David K.",
-    role: "Financial Advisor",
+    role: "Portfolio Manager",
     rating: 5,
   },
   {
     id: 4,
-    text: "Have you claimed your $200K NESARA GESARA payout? The transition to QFS is happening—don't be left behind!",
+    text: "Onboarding was straightforward, and the account experience feels built for real digital finance instead of scattered wallet tools.",
     author: "Jennifer M.",
-    role: "QFS Advocate",
+    role: "Web3 User",
     rating: 5,
   },
 ];
@@ -111,8 +111,8 @@ const CustomerTestimonials = () => {
               className="text-base leading-relaxed md:text-right max-w-xs"
               style={{ color: "#5A7A96" }}
             >
-              Join thousands who have already transitioned to quantum-secure
-              finance.
+              Join users managing wallets, assets, and blockchain activity with
+              more clarity.
             </p>
           </div>
         </motion.div>

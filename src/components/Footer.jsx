@@ -8,8 +8,8 @@ import {
 } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
 
-// ── Same QFS logo used across the site ──
-const QFSLogo = ({ size = 40 }) => (
+// ── Web3 Ledger Logo: WL monogram with circuit detail ──
+const Web3LedgerLogo = ({ size = 40 }) => (
   <svg
     width={size}
     height={size}
@@ -19,7 +19,7 @@ const QFSLogo = ({ size = 40 }) => (
   >
     <defs>
       <linearGradient
-        id="ftBorder"
+        id="footerWeb3LedgerBorder"
         x1="0"
         y1="0"
         x2="60"
@@ -29,61 +29,45 @@ const QFSLogo = ({ size = 40 }) => (
         <stop offset="0%" stopColor="#C9A84C" />
         <stop offset="100%" stopColor="#F0C040" />
       </linearGradient>
-      <linearGradient id="ftChip" x1="0" y1="0" x2="1" y2="1">
+      <linearGradient id="footerWeb3LedgerGold" x1="8" y1="8" x2="52" y2="52">
         <stop offset="0%" stopColor="#F0C040" />
         <stop offset="100%" stopColor="#C9A84C" />
       </linearGradient>
+      <linearGradient id="footerWeb3LedgerCyan" x1="12" y1="12" x2="48" y2="48">
+        <stop offset="0%" stopColor="#5CE1E6" />
+        <stop offset="100%" stopColor="#8EB1CE" />
+      </linearGradient>
     </defs>
-    <rect
-      x="1.5"
-      y="1.5"
-      width="57"
-      height="57"
-      rx="14"
-      fill="#07111F"
-      stroke="url(#ftBorder)"
-      strokeWidth="1.5"
+    <rect x="4" y="4" width="52" height="52" rx="14" fill="transparent" />
+    <path
+      d="M12 16H22L26 38L31 21L36 38L41 16H48"
+      stroke="url(#footerWeb3LedgerGold)"
+      strokeWidth="5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
-    <rect
-      x="5"
-      y="5"
-      width="50"
-      height="50"
-      rx="11"
-      fill="none"
-      stroke="rgba(201,168,76,0.08)"
-      strokeWidth="0.75"
+    <path
+      d="M42 18V42H51"
+      stroke="#F7E4A5"
+      strokeWidth="5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
-    <text
-      x="25"
-      y="43"
-      fontSize="38"
-      fontWeight="900"
-      fontFamily="system-ui,-apple-system,sans-serif"
-      fill="#F0C040"
-      textAnchor="middle"
-      letterSpacing="-1"
-    >
-      Q
-    </text>
-    <rect x="35" y="36" width="19" height="15" rx="4" fill="url(#ftChip)" />
-    <text
-      x="44.5"
-      y="47"
-      fontSize="9"
-      fontWeight="800"
-      fontFamily="system-ui,-apple-system,sans-serif"
-      fill="#07111F"
-      textAnchor="middle"
-      letterSpacing="0.5"
-    >
-      FS
-    </text>
+    <path
+      d="M15 45H27M27 45V39M47 14H53M53 14V21M13 23H7M7 23V31"
+      stroke="url(#footerWeb3LedgerCyan)"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle cx="27" cy="45" r="2.4" fill="#5CE1E6" />
+    <circle cx="53" cy="21" r="2.4" fill="#5CE1E6" />
+    <circle cx="7" cy="31" r="2.4" fill="#5CE1E6" />
   </svg>
 );
 
-const quickLinks = ["Home", "About QFS", "Fund Security", "Crypto Markets"];
-const resources = ["Documentation", "FRA Guide", "ISO 20022"];
+const quickLinks = ["Home", "About Web3", "Asset Security", "Crypto Markets"];
+const resources = ["Documentation", "Wallet Guide", "Blockchain Basics"];
 const contacts = [
   { icon: EnvelopeIcon, text: "Web3globalledger@gmail.com" },
   { icon: PhoneIcon, text: "+1 (888) WEB3-LEDGE" },
@@ -140,14 +124,14 @@ const Footer = () => {
               <div
                 style={{ filter: "drop-shadow(0 0 8px rgba(201,168,76,0.25))" }}
               >
-                <QFSLogo size={40} />
+                <Web3LedgerLogo size={40} />
               </div>
               <div className="flex flex-col leading-none">
                 <span
                   className="font-black text-white"
                   style={{ fontSize: "1.05rem", letterSpacing: "-0.02em" }}
                 >
-                  QFS
+                  Web3
                 </span>
                 <span
                   className="font-semibold uppercase mt-0.5"
@@ -163,11 +147,11 @@ const Footer = () => {
             </motion.div>
 
             <p className="text-sm leading-relaxed" style={{ color: "#3D5A70" }}>
-              Quantum Financial System Ledger provides quantum-resistant
-              financial infrastructure for the future of global finance.
+              Web3 Ledger helps users manage wallets, track digital assets, and
+              review blockchain activity with confidence.
             </p>
 
-            {/* Compliance badge */}
+            {/* Security badge */}
             <div
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium"
               style={{
@@ -177,7 +161,7 @@ const Footer = () => {
               }}
             >
               <ShieldCheckIcon className="w-3.5 h-3.5" />
-              ISO 20022 Compliant
+              Wallet Security
             </div>
           </div>
 
@@ -309,7 +293,7 @@ const Footer = () => {
           style={{ borderBottom: "1px solid rgba(201,168,76,0.06)" }}
         >
           <span className="text-xs tabular-nums" style={{ color: "#243547" }}>
-            © {new Date().getFullYear()} QFS Ledger. All rights reserved.
+            © {new Date().getFullYear()} Web3 Ledger. All rights reserved.
           </span>
 
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
@@ -340,8 +324,8 @@ const Footer = () => {
             className="text-xs leading-relaxed max-w-2xl mx-auto"
             style={{ color: "#1E3347" }}
           >
-            QFS Ledger delivers quantum-resistant financial infrastructure with
-            FRA protection for fund security during monetary transitions.
+            Web3 Ledger delivers wallet-focused tools for secure digital asset
+            management, transparent activity, and modern blockchain finance.
           </p>
         </motion.div>
       </div>

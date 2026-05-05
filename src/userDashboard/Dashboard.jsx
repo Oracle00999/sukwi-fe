@@ -1,20 +1,20 @@
 // pages/UserDashboard.jsx
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { HospitalIcon } from "lucide-react";
 import {
-  ArrowUpTrayIcon,
-  ArrowDownTrayIcon,
-  ArrowsRightLeftIcon,
-  CheckBadgeIcon,
-  ClockIcon,
-  XCircleIcon,
-  BellIcon,
-  ShieldCheckIcon,
-  CpuChipIcon,
-  CircleStackIcon,
-  CreditCardIcon,
-} from "@heroicons/react/24/outline";
+  FaBitcoin,
+  FaCoins,
+  FaHospital,
+  FaLink,
+  FaMoneyBillTransfer,
+  FaRegBell,
+  FaRegCircleCheck,
+  FaRegCircleXmark,
+  FaRegClock,
+  FaRegCreditCard,
+  FaShieldHalved,
+  FaWallet,
+} from "react-icons/fa6";
 
 const PRICE_FETCH_INTERVAL = 5 * 60 * 60 * 1000;
 
@@ -71,24 +71,24 @@ const notifications = [
 ];
 
 const actionButtons = [
-  { to: "/deposit", icon: ArrowUpTrayIcon, label: "Deposit" },
-  { to: "/withdraw", icon: ArrowDownTrayIcon, label: "Receive" },
-  { to: "/link", icon: ArrowsRightLeftIcon, label: "Link" },
-  { to: "/kyc-verify", icon: ShieldCheckIcon, label: "Verify" },
-  { to: "/medbed", icon: HospitalIcon, label: "Medbed" },
-  { to: "/buy", icon: CpuChipIcon, label: "Buy Crypto" },
-  { to: "/staking", icon: CircleStackIcon, label: "Staking" },
-  { to: "/card-creation", icon: CreditCardIcon, label: "Card" },
+  { to: "/deposit", icon: FaWallet, label: "Deposit" },
+  { to: "/withdraw", icon: FaMoneyBillTransfer, label: "Receive" },
+  { to: "/link", icon: FaLink, label: "Link" },
+  { to: "/kyc-verify", icon: FaShieldHalved, label: "Verify" },
+  { to: "/medbed", icon: FaHospital, label: "Medbed" },
+  { to: "/buy", icon: FaBitcoin, label: "Buy Crypto" },
+  { to: "/staking", icon: FaCoins, label: "Staking" },
+  { to: "/card-creation", icon: FaRegCreditCard, label: "Card" },
 ];
 
 const kycConfig = {
   verified: {
-    icon: CheckBadgeIcon,
+    icon: FaRegCircleCheck,
     label: "KYC Verified",
     className: "border-emerald-400/25 bg-emerald-400/10 text-emerald-400",
   },
   pending: {
-    icon: ClockIcon,
+    icon: FaRegClock,
     label: "KYC Pending",
     className: "border-amber-400/25 bg-amber-400/10 text-amber-400",
   },
@@ -246,7 +246,7 @@ const UserDashboard = () => {
   const KycBadge = ({ status }) => {
     const cfg =
       kycConfig[status] || {
-        icon: XCircleIcon,
+        icon: FaRegCircleXmark,
         label: "KYC Required",
         className: "border-red-400/25 bg-red-400/10 text-red-400",
       };
@@ -295,7 +295,7 @@ const UserDashboard = () => {
                 onClick={() => setShowNotifications((value) => !value)}
                 className="relative flex h-9 w-9 items-center justify-center rounded-full border border-[#C9A84C]/20 bg-[#C9A84C]/10 transition hover:border-[#C9A84C]/40 hover:bg-[#C9A84C]/15"
               >
-                <BellIcon className="h-4 w-4 text-[#C9A84C]" />
+                <FaRegBell className="h-4 w-4 text-[#C9A84C]" />
                 {notifications.some((notification) => !notification.read) && (
                   <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full border-2 border-[#07111F] bg-red-500" />
                 )}
@@ -448,7 +448,7 @@ const UserDashboard = () => {
       </section>
 
       <div className="mb-20 flex items-start gap-3 rounded-[14px] border border-[#C9A84C]/10 bg-[#C9A84C]/5 px-4 py-3.5">
-        <ShieldCheckIcon className="mt-0.5 h-[18px] w-[18px] shrink-0 text-[#C9A84C]" />
+        <FaShieldHalved className="mt-0.5 h-[18px] w-[18px] shrink-0 text-[#C9A84C]" />
         <p className="m-0 text-xs leading-5 text-[#3D5A70]">
           All assets are protected by quantum-resistant encryption and FRA fund
           recovery system. Prices update every 5 hours.

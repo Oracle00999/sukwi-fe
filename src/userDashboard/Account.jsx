@@ -2,21 +2,21 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  ArrowUpTrayIcon,
-  ArrowDownTrayIcon,
-  ArrowsRightLeftIcon,
-  ShoppingCartIcon,
-  CheckCircleIcon,
-  ClockIcon,
-  XCircleIcon,
-  Cog6ToothIcon,
-  ShieldCheckIcon,
-  CreditCardIcon,
-  EnvelopeIcon,
-  UserIcon,
-  PhoneIcon,
-  GlobeAltIcon,
-} from "@heroicons/react/24/outline";
+  FaCartShopping,
+  FaEnvelope,
+  FaGear,
+  FaGlobe,
+  FaMoneyBillTransfer,
+  FaPhone,
+  FaRegCircleCheck,
+  FaRegCircleXmark,
+  FaRegClock,
+  FaRegCreditCard,
+  FaRightLeft,
+  FaShieldHalved,
+  FaUser,
+  FaWallet,
+} from "react-icons/fa6";
 
 // ── QFS Logo (same as rest of dashboard) ──
 const QFSLogo = ({ size = 44 }) => (
@@ -94,7 +94,7 @@ const QFSLogo = ({ size = 44 }) => (
 
 const kycCfg = {
   verified: {
-    icon: CheckCircleIcon,
+    icon: FaRegCircleCheck,
     label: "KYC Verified",
     color: "#4ADE80",
     bg: "rgba(74,222,128,0.08)",
@@ -102,7 +102,7 @@ const kycCfg = {
     actionText: "Verified",
   },
   pending: {
-    icon: ClockIcon,
+    icon: FaRegClock,
     label: "KYC Pending",
     color: "#F59E0B",
     bg: "rgba(245,158,11,0.08)",
@@ -110,7 +110,7 @@ const kycCfg = {
     actionText: "Pending Review",
   },
   default: {
-    icon: XCircleIcon,
+    icon: FaRegCircleXmark,
     label: "KYC Required",
     color: "#EF4444",
     bg: "rgba(239,68,68,0.08)",
@@ -123,51 +123,51 @@ const getKyc = (status) => kycCfg[status] || kycCfg.default;
 const walletActions = [
   {
     to: "/kyc-verify",
-    icon: ShieldCheckIcon,
+    icon: FaShieldHalved,
     label: "KYC Verification",
     sub: "Identity verification",
     kyc: true,
   },
   {
     to: "/card-creation",
-    icon: CreditCardIcon,
+    icon: FaRegCreditCard,
     label: "Create Card",
     sub: "Create a new card",
   },
   {
     to: "/history",
-    icon: ClockIcon,
+    icon: FaRegClock,
     label: "History",
     sub: "View transactions",
   },
   {
     to: "/deposit",
-    icon: ArrowUpTrayIcon,
+    icon: FaWallet,
     label: "Send Funds",
     sub: "Deposit to wallet",
   },
   {
     to: "/withdraw",
-    icon: ArrowDownTrayIcon,
+    icon: FaMoneyBillTransfer,
     label: "Withdraw",
     sub: "Send to external wallet",
   },
   {
     href: "https://www.moonpay.com/buy/xlm",
-    icon: ShoppingCartIcon,
+    icon: FaCartShopping,
     label: "Buy & Sell",
     sub: "Trade crypto",
     external: true,
   },
   {
     to: "/swap",
-    icon: ArrowsRightLeftIcon,
+    icon: FaRightLeft,
     label: "Swap",
     sub: "Exchange between cryptos",
   },
   {
     to: "/link",
-    icon: Cog6ToothIcon,
+    icon: FaGear,
     label: "Link Wallet",
     sub: "Connect external wallet",
   },
@@ -785,24 +785,24 @@ const Account = () => {
           >
             {[
               {
-                icon: UserIcon,
+                icon: FaUser,
                 label: "Full Name",
                 value: userData?.firstName
                   ? `${userData.firstName} ${userData.lastName || ""}`.trim()
                   : userData?.fullName || "—",
               },
               {
-                icon: EnvelopeIcon,
+                icon: FaEnvelope,
                 label: "Email Address",
                 value: userData?.email || "—",
               },
               {
-                icon: PhoneIcon,
+                icon: FaPhone,
                 label: "Phone Number",
                 value: userData?.phone || "—",
               },
               {
-                icon: GlobeAltIcon,
+                icon: FaGlobe,
                 label: "Country",
                 value: userData?.country || "—",
               },

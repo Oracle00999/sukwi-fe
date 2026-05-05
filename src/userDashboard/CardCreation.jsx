@@ -243,10 +243,10 @@ const CardCreation = () => {
             letterSpacing: "-0.02em",
           }}
         >
-          Create Your QFS Ledger Card
+          Create Your Web3 Ledger Card
         </h1>
         <p style={{ fontSize: 12, color: "#3D5A70", margin: "4px 0 0" }}>
-          Fill in your details to request a quantum-secure payment card
+          Fill in your details to request a wallet-ready digital asset card
         </p>
       </div>
 
@@ -370,7 +370,7 @@ const CardCreation = () => {
                   letterSpacing: "0.08em",
                 }}
               >
-                QFS Ledger
+                Web3 Ledger
               </p>
               <p
                 style={{
@@ -379,7 +379,7 @@ const CardCreation = () => {
                   color: "rgba(255,255,255,0.62)",
                 }}
               >
-                Quantum Secure Payment Card
+                Digital Asset Payment Card
               </p>
             </div>
             <div
@@ -853,7 +853,7 @@ const CardCreation = () => {
               ) : insufficientBalance ? (
                 "Minimum $3,000 Required"
               ) : (
-                "Create Quantum-Secure Card"
+                "Create Web3 Ledger Card"
               )}
             </button>
           </form>
@@ -897,7 +897,7 @@ const CardCreation = () => {
                   lineHeight: 1.6,
                 }}
               >
-                All your card details are protected with quantum-resistant
+                All your card details are protected with wallet-focused
                 encryption. Your personal information is securely encrypted and
                 will only be used for card issuance and verification purposes.
               </p>

@@ -12,30 +12,30 @@ const features = [
   {
     icon: ShieldCheckIcon,
     index: "01",
-    title: "Smart Contract FRA",
+    title: "Smart Contract Security",
     description:
-      "Automated asset recovery through blockchain smart contracts during system transitions.",
+      "Web3 Ledger helps protect wallet activity with secure transaction flows and smart contract-aware safeguards.",
   },
   {
     icon: LockClosedIcon,
     index: "02",
-    title: "Tokenized Assets",
+    title: "Digital Asset Control",
     description:
-      "ISO-compliant digital tokens (XLM, XRP) with blockchain verification and protection.",
+      "Manage crypto, tokens, and wallet balances through a simple ledger built for modern digital ownership.",
   },
   {
     icon: GlobeAltIcon,
     index: "03",
-    title: "Global Ledger Security",
+    title: "Transparent Ledger Activity",
     description:
-      "Distributed ledger technology ensuring transparency across all financial operations.",
+      "Track blockchain transactions and account movement with clear visibility across your Web3 activity.",
   },
 ];
 
 const badges = [
+  "Wallet Ready",
+  "Smart Contract Aware",
   "Blockchain Verified",
-  "Smart Contract Protected",
-  "ISO 20022 Compliant",
 ];
 
 const containerVariants = {
@@ -96,7 +96,7 @@ const FundSecurity = () => {
               className="text-xs font-semibold tracking-[0.2em] uppercase"
               style={{ color: "#C9A84C" }}
             >
-              Web3 FRA Protection
+              Web3 Asset Protection
             </span>
             <div
               className="h-px w-10"
@@ -110,7 +110,7 @@ const FundSecurity = () => {
             className="font-black leading-[1.05] tracking-tight mb-5"
             style={{ fontSize: "clamp(2rem, 3.8vw, 3.2rem)" }}
           >
-            <span className="text-white">Web3Global Ledger </span>
+            <span className="text-white">Web3 Ledger </span>
             <span
               style={{
                 background: "linear-gradient(90deg, #C9A84C, #F0C040)",
@@ -118,14 +118,13 @@ const FundSecurity = () => {
                 WebkitTextFillColor: "transparent",
               }}
             >
-              Fund Security
+              Asset Security
             </span>
           </h2>
 
           <p className="text-base leading-relaxed" style={{ color: "#5A7A96" }}>
-            Blockchain-powered Funds Retrieving Agent (FRA) with smart contract
-            automation for digital asset protection during financial
-            transitions.
+            Blockchain-powered wallet protection, digital asset controls, and
+            transparent ledger activity for modern Web3 finance.
           </p>
         </motion.div>
 

@@ -3,8 +3,8 @@ import React, { useState, useEffect } from "react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 
-// ── QFS Logo: large Q dominant, FS gold chip overlapping the tail ──
-const QFSLogo = ({ size = 40 }) => {
+// ── Web3 Ledger Logo: WL monogram with circuit detail ──
+const Web3LedgerLogo = ({ size = 40 }) => {
   const s = size;
   return (
     <svg
@@ -16,7 +16,7 @@ const QFSLogo = ({ size = 40 }) => {
     >
       <defs>
         <linearGradient
-          id="qfsBorder"
+          id="web3LedgerBorder"
           x1="0"
           y1="0"
           x2="60"
@@ -26,66 +26,42 @@ const QFSLogo = ({ size = 40 }) => {
           <stop offset="0%" stopColor="#C9A84C" />
           <stop offset="100%" stopColor="#F0C040" />
         </linearGradient>
-        <linearGradient id="qfsChip" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id="web3LedgerGold" x1="8" y1="8" x2="52" y2="52">
           <stop offset="0%" stopColor="#F0C040" />
           <stop offset="100%" stopColor="#C9A84C" />
         </linearGradient>
+        <linearGradient id="web3LedgerCyan" x1="12" y1="12" x2="48" y2="48">
+          <stop offset="0%" stopColor="#5CE1E6" />
+          <stop offset="100%" stopColor="#8EB1CE" />
+        </linearGradient>
       </defs>
 
-      {/* Rounded square background */}
-      <rect
-        x="1.5"
-        y="1.5"
-        width="57"
-        height="57"
-        rx="14"
-        fill="#07111F"
-        stroke="url(#qfsBorder)"
-        strokeWidth="1.5"
+      <rect x="4" y="4" width="52" height="52" rx="14" fill="transparent" />
+
+      <path
+        d="M12 16H22L26 38L31 21L36 38L41 16H48"
+        stroke="url(#web3LedgerGold)"
+        strokeWidth="5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
-
-      {/* Subtle inner border */}
-      <rect
-        x="5"
-        y="5"
-        width="50"
-        height="50"
-        rx="11"
-        fill="none"
-        stroke="rgba(201,168,76,0.08)"
-        strokeWidth="0.75"
+      <path
+        d="M42 18V42H51"
+        stroke="#F7E4A5"
+        strokeWidth="5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
-
-      {/* Large Q — slightly left of center to leave room for chip */}
-      <text
-        x="25"
-        y="43"
-        fontSize="38"
-        fontWeight="900"
-        fontFamily="system-ui, -apple-system, sans-serif"
-        fill="#F0C040"
-        textAnchor="middle"
-        letterSpacing="-1"
-      >
-        Q
-      </text>
-
-      {/* FS chip — sits over the Q's tail/bottom-right */}
-      <rect x="35" y="36" width="19" height="15" rx="4" fill="url(#qfsChip)" />
-
-      {/* FS text inside chip — dark sapphire for contrast */}
-      <text
-        x="44.5"
-        y="47"
-        fontSize="9"
-        fontWeight="800"
-        fontFamily="system-ui, -apple-system, sans-serif"
-        fill="#07111F"
-        textAnchor="middle"
-        letterSpacing="0.5"
-      >
-        FS
-      </text>
+      <path
+        d="M15 45H27M27 45V39M47 14H53M53 14V21M13 23H7M7 23V31"
+        stroke="url(#web3LedgerCyan)"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="27" cy="45" r="2.4" fill="#5CE1E6" />
+      <circle cx="53" cy="21" r="2.4" fill="#5CE1E6" />
+      <circle cx="7" cy="31" r="2.4" fill="#5CE1E6" />
     </svg>
   );
 };
@@ -161,7 +137,7 @@ const Navbar = () => {
               }
               onMouseLeave={(e) => (e.currentTarget.style.filter = "none")}
             >
-              <QFSLogo size={40} />
+              <Web3LedgerLogo size={40} />
             </div>
 
             <div className="flex flex-col leading-none">
@@ -169,7 +145,7 @@ const Navbar = () => {
                 className="font-black text-white"
                 style={{ fontSize: "1.1rem", letterSpacing: "-0.02em" }}
               >
-                QFS
+                Web3
               </span>
               <span
                 className="font-semibold uppercase mt-0.5"

@@ -2,40 +2,35 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
-  HomeIcon,
-  ArrowDownTrayIcon,
-  ArrowsRightLeftIcon,
-  UserCircleIcon,
-} from "@heroicons/react/24/outline";
-import {
-  HomeIcon as HomeIconSolid,
-  ArrowDownTrayIcon as ArrowDownTraySolid,
-  ArrowsRightLeftIcon as ArrowsRightLeftSolid,
-  UserCircleIcon as UserCircleSolid,
-} from "@heroicons/react/24/solid";
+  FaCircleUser,
+  FaHouse,
+  FaMoneyBillTransfer,
+  FaRegCircleUser,
+  FaRightLeft,
+} from "react-icons/fa6";
 
 const navItems = [
   {
-    icon: HomeIcon,
-    iconActive: HomeIconSolid,
+    icon: FaHouse,
+    iconActive: FaHouse,
     label: "Home",
     path: "/dashboard",
   },
   {
-    icon: ArrowDownTrayIcon,
-    iconActive: ArrowDownTraySolid,
+    icon: FaMoneyBillTransfer,
+    iconActive: FaMoneyBillTransfer,
     label: "Receive",
     path: "/withdraw",
   },
   {
-    icon: ArrowsRightLeftIcon,
-    iconActive: ArrowsRightLeftSolid,
+    icon: FaRightLeft,
+    iconActive: FaRightLeft,
     label: "Swap",
     path: "/swap",
   },
   {
-    icon: UserCircleIcon,
-    iconActive: UserCircleSolid,
+    icon: FaRegCircleUser,
+    iconActive: FaCircleUser,
     label: "Account",
     path: "/account",
   },

@@ -10,10 +10,9 @@ import {
   CheckCircleIcon,
   XCircleIcon,
 } from "@heroicons/react/24/outline";
-import Navbar from "../components/Navbar";
 
-// ── Same QFS logo as Navbar & Signup ──
-const QFSLogo = ({ size = 60 }) => (
+// ── Web3 Ledger Logo: WL monogram with circuit detail ──
+const Web3LedgerLogo = ({ size = 60 }) => (
   <svg
     width={size}
     height={size}
@@ -23,7 +22,7 @@ const QFSLogo = ({ size = 60 }) => (
   >
     <defs>
       <linearGradient
-        id="lgBorder"
+        id="signinWeb3LedgerBorder"
         x1="0"
         y1="0"
         x2="60"
@@ -33,56 +32,47 @@ const QFSLogo = ({ size = 60 }) => (
         <stop offset="0%" stopColor="#C9A84C" />
         <stop offset="100%" stopColor="#F0C040" />
       </linearGradient>
-      <linearGradient id="lgChip" x1="0" y1="0" x2="1" y2="1">
+      <linearGradient id="signinWeb3LedgerGold" x1="8" y1="8" x2="52" y2="52">
         <stop offset="0%" stopColor="#F0C040" />
         <stop offset="100%" stopColor="#C9A84C" />
       </linearGradient>
+      <linearGradient id="signinWeb3LedgerCyan" x1="12" y1="12" x2="48" y2="48">
+        <stop offset="0%" stopColor="#5CE1E6" />
+        <stop offset="100%" stopColor="#8EB1CE" />
+      </linearGradient>
     </defs>
     <rect
-      x="1.5"
-      y="1.5"
-      width="57"
-      height="57"
+      x="4"
+      y="4"
+      width="52"
+      height="52"
       rx="14"
-      fill="#07111F"
-      stroke="url(#lgBorder)"
-      strokeWidth="1.5"
+      fill="transparent"
     />
-    <rect
-      x="5"
-      y="5"
-      width="50"
-      height="50"
-      rx="11"
-      fill="none"
-      stroke="rgba(201,168,76,0.08)"
-      strokeWidth="0.75"
+    <path
+      d="M12 16H22L26 38L31 21L36 38L41 16H48"
+      stroke="url(#signinWeb3LedgerGold)"
+      strokeWidth="5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
-    <text
-      x="25"
-      y="43"
-      fontSize="38"
-      fontWeight="900"
-      fontFamily="system-ui,-apple-system,sans-serif"
-      fill="#F0C040"
-      textAnchor="middle"
-      letterSpacing="-1"
-    >
-      Q
-    </text>
-    <rect x="35" y="36" width="19" height="15" rx="4" fill="url(#lgChip)" />
-    <text
-      x="44.5"
-      y="47"
-      fontSize="9"
-      fontWeight="800"
-      fontFamily="system-ui,-apple-system,sans-serif"
-      fill="#07111F"
-      textAnchor="middle"
-      letterSpacing="0.5"
-    >
-      FS
-    </text>
+    <path
+      d="M42 18V42H51"
+      stroke="#F7E4A5"
+      strokeWidth="5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M15 45H27M27 45V39M47 14H53M53 14V21M13 23H7M7 23V31"
+      stroke="url(#signinWeb3LedgerCyan)"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle cx="27" cy="45" r="2.4" fill="#5CE1E6" />
+    <circle cx="53" cy="21" r="2.4" fill="#5CE1E6" />
+    <circle cx="7" cy="31" r="2.4" fill="#5CE1E6" />
   </svg>
 );
 
@@ -235,7 +225,7 @@ const Login = () => {
                       filter: "drop-shadow(0 0 16px rgba(201,168,76,0.3))",
                     }}
                   >
-                    <QFSLogo size={60} />
+                    <Web3LedgerLogo size={60} />
                   </div>
                 </div>
                 <h2
@@ -250,7 +240,7 @@ const Login = () => {
                   Welcome Back
                 </h2>
                 <p style={{ fontSize: 13, color: "#3D5A70", margin: 0 }}>
-                  Sign in to your QFS Ledger account
+                  Sign in to your Web3 Ledger account
                 </p>
               </div>
 

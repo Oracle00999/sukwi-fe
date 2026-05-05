@@ -73,7 +73,7 @@ const Hero = () => {
             >
               <span className="w-1.5 h-1.5 rounded-full bg-[#C9A84C] animate-pulse" />
               <span className="text-xs font-medium tracking-widest uppercase text-[#C9A84C]">
-                QFS Network — Live
+                Web3 Ledger Network — Live
               </span>
             </motion.div>
 
@@ -87,7 +87,7 @@ const Hero = () => {
                 className="font-black leading-[1.05] tracking-tight"
                 style={{ fontSize: "clamp(2.6rem, 4.5vw, 4rem)" }}
               >
-                <span className="block text-white">QFS-Worldwide</span>
+                <span className="block text-white">Web3</span>
                 <span
                   className="block mt-1"
                   style={{
@@ -100,7 +100,7 @@ const Hero = () => {
                   Ledger
                 </span>
                 <span className="block text-[#7A9CBE] text-2xl font-light tracking-normal mt-3">
-                  Web3 · Blockchain · QFS
+                  Wallets · Digital Assets · Blockchain
                 </span>
               </h1>
             </motion.div>
@@ -112,9 +112,9 @@ const Hero = () => {
               transition={{ duration: 0.7, delay: 0.3 }}
               className="text-[#8EB1CE] text-lg leading-relaxed max-w-[480px]"
             >
-              Quantum Financial System infrastructure built for the next era of
-              digital assets. Institutional-grade custody, real-time settlement,
-              and Fund Retrieval protection — all in one platform.
+              Secure Web3 infrastructure for managing digital assets with
+              confidence. Connect wallets, protect your holdings, and move
+              crypto across modern blockchain networks from one trusted ledger.
             </motion.p>
 
             {/* Feature pills */}
@@ -127,11 +127,11 @@ const Hero = () => {
               {[
                 {
                   icon: <ShieldCheckIcon className="w-4 h-4" />,
-                  label: "Sovereign Security",
+                  label: "Wallet Security",
                 },
                 {
                   icon: <LockClosedIcon className="w-4 h-4" />,
-                  label: "Fund Retrieval",
+                  label: "Asset Protection",
                 },
                 {
                   icon: (
@@ -146,7 +146,7 @@ const Hero = () => {
                       <path d="M12 6v6l4 2" />
                     </svg>
                   ),
-                  label: "Real-time Settlement",
+                  label: "Fast Transactions",
                 },
               ].map(({ icon, label }) => (
                 <div
@@ -234,7 +234,7 @@ const Hero = () => {
           >
             <img
               src={Hero1}
-              alt="QFS dashboard preview"
+              alt="Web3 Ledger dashboard preview"
               className="block w-full h-auto rounded-[2rem] object-cover"
             />
           </motion.div>

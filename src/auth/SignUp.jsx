@@ -16,7 +16,7 @@ import {
 } from "@heroicons/react/24/outline";
 // import Navbar from "../components/Navbar"; // ← commented out to fix input blocking
 
-const QFSLogo = ({ size = 60 }) => (
+const Web3LedgerLogo = ({ size = 60 }) => (
   <svg
     width={size}
     height={size}
@@ -26,7 +26,7 @@ const QFSLogo = ({ size = 60 }) => (
   >
     <defs>
       <linearGradient
-        id="spBorder"
+        id="signupWeb3LedgerBorder"
         x1="0"
         y1="0"
         x2="60"
@@ -36,56 +36,47 @@ const QFSLogo = ({ size = 60 }) => (
         <stop offset="0%" stopColor="#C9A84C" />
         <stop offset="100%" stopColor="#F0C040" />
       </linearGradient>
-      <linearGradient id="spChip" x1="0" y1="0" x2="1" y2="1">
+      <linearGradient id="signupWeb3LedgerGold" x1="8" y1="8" x2="52" y2="52">
         <stop offset="0%" stopColor="#F0C040" />
         <stop offset="100%" stopColor="#C9A84C" />
       </linearGradient>
+      <linearGradient id="signupWeb3LedgerCyan" x1="12" y1="12" x2="48" y2="48">
+        <stop offset="0%" stopColor="#5CE1E6" />
+        <stop offset="100%" stopColor="#8EB1CE" />
+      </linearGradient>
     </defs>
     <rect
-      x="1.5"
-      y="1.5"
-      width="57"
-      height="57"
+      x="4"
+      y="4"
+      width="52"
+      height="52"
       rx="14"
-      fill="#07111F"
-      stroke="url(#spBorder)"
-      strokeWidth="1.5"
+      fill="transparent"
     />
-    <rect
-      x="5"
-      y="5"
-      width="50"
-      height="50"
-      rx="11"
-      fill="none"
-      stroke="rgba(201,168,76,0.08)"
-      strokeWidth="0.75"
+    <path
+      d="M12 16H22L26 38L31 21L36 38L41 16H48"
+      stroke="url(#signupWeb3LedgerGold)"
+      strokeWidth="5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
-    <text
-      x="25"
-      y="43"
-      fontSize="38"
-      fontWeight="900"
-      fontFamily="system-ui,-apple-system,sans-serif"
-      fill="#F0C040"
-      textAnchor="middle"
-      letterSpacing="-1"
-    >
-      Q
-    </text>
-    <rect x="35" y="36" width="19" height="15" rx="4" fill="url(#spChip)" />
-    <text
-      x="44.5"
-      y="47"
-      fontSize="9"
-      fontWeight="800"
-      fontFamily="system-ui,-apple-system,sans-serif"
-      fill="#07111F"
-      textAnchor="middle"
-      letterSpacing="0.5"
-    >
-      FS
-    </text>
+    <path
+      d="M42 18V42H51"
+      stroke="#F7E4A5"
+      strokeWidth="5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M15 45H27M27 45V39M47 14H53M53 14V21M13 23H7M7 23V31"
+      stroke="url(#signupWeb3LedgerCyan)"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle cx="27" cy="45" r="2.4" fill="#5CE1E6" />
+    <circle cx="53" cy="21" r="2.4" fill="#5CE1E6" />
+    <circle cx="7" cy="31" r="2.4" fill="#5CE1E6" />
   </svg>
 );
 
@@ -422,7 +413,7 @@ const Signup = () => {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <QFSLogo size={32} />
+          <Web3LedgerLogo size={32} />
           <div style={{ lineHeight: 1 }}>
             <div
               style={{
@@ -432,7 +423,7 @@ const Signup = () => {
                 letterSpacing: "-0.02em",
               }}
             >
-              QFS
+              Web3
             </div>
             <div
               style={{
@@ -519,7 +510,7 @@ const Signup = () => {
                       filter: "drop-shadow(0 0 16px rgba(201,168,76,0.3))",
                     }}
                   >
-                    <QFSLogo size={56} />
+                    <Web3LedgerLogo size={56} />
                   </div>
                 </div>
                 <h2
@@ -531,7 +522,7 @@ const Signup = () => {
                     letterSpacing: "-0.02em",
                   }}
                 >
-                  Join QFS Ledger
+                  Join Web3 Ledger
                 </h2>
                 <p style={{ fontSize: 13, color: "#3D5A70", margin: 0 }}>
                   Create your sovereign-grade account
