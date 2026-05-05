@@ -4,7 +4,6 @@ import {
   XCircle,
   RefreshCw,
   Eye,
-  EyeOff,
   FileText,
   AlertCircle,
   Loader2,
@@ -185,6 +184,7 @@ const PendingKYC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [processingId, setProcessingId] = useState(null);
+  const [processingAction, setProcessingAction] = useState(null);
   const [notification, setNotification] = useState(null);
   const [viewingDocumentId, setViewingDocumentId] = useState(null);
 
@@ -254,6 +254,7 @@ const PendingKYC = () => {
   const verifyKYC = async (id) => {
     try {
       setProcessingId(id);
+      setProcessingAction("verify");
 
       const token = getAuthToken();
 
@@ -294,6 +295,7 @@ const PendingKYC = () => {
       showNotification("error", err.message || "Failed to verify KYC");
     } finally {
       setProcessingId(null);
+      setProcessingAction(null);
     }
   };
 
@@ -301,6 +303,7 @@ const PendingKYC = () => {
   const rejectKYC = async (id) => {
     try {
       setProcessingId(id);
+      setProcessingAction("reject");
 
       const token = getAuthToken();
 
@@ -341,6 +344,7 @@ const PendingKYC = () => {
       showNotification("error", err.message || "Failed to reject KYC");
     } finally {
       setProcessingId(null);
+      setProcessingAction(null);
     }
   };
 
@@ -462,83 +466,91 @@ const PendingKYC = () => {
                   </td>
                 </tr>
               ) : (
-                kycSubmissions.map((kyc) => (
-                  <tr key={kyc.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {kyc.user.name}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {kyc.user.email}
-                        </p>
-                        {/* <p className="text-xs text-gray-400 mt-1">
-                          Joined: {formatDate(kyc.user.joinedAt)}
-                        </p> */}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center">
-                        <FileText className="h-4 w-4 text-gray-400 mr-2" />
-                        <span className="text-sm font-medium text-gray-900">
-                          {formatDocumentType(kyc.documentType)}
+                kycSubmissions.map((kyc) => {
+                  const isProcessing = processingId === kyc.id;
+                  const isVerifying =
+                    isProcessing && processingAction === "verify";
+                  const isRejecting =
+                    isProcessing && processingAction === "reject";
+
+                  return (
+                    <tr key={kyc.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4">
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            {kyc.user.name}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {kyc.user.email}
+                          </p>
+                          {/* <p className="text-xs text-gray-400 mt-1">
+                            Joined: {formatDate(kyc.user.joinedAt)}
+                          </p> */}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center">
+                          <FileText className="h-4 w-4 text-gray-400 mr-2" />
+                          <span className="text-sm font-medium text-gray-900">
+                            {formatDocumentType(kyc.documentType)}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm font-mono text-gray-900">
+                          {kyc.documentNumber}
                         </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm font-mono text-gray-900">
-                        {kyc.documentNumber}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-500">
-                        {formatDate(kyc.submittedAt)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <button
-                        onClick={() => viewDocument(kyc.id)}
-                        className="flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
-                      >
-                        <Eye className="h-4 w-4 mr-1.5" />
-                        View Document
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                        Pending
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center space-x-2">
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm text-gray-500">
+                          {formatDate(kyc.submittedAt)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
                         <button
-                          onClick={() => verifyKYC(kyc.id)}
-                          disabled={processingId === kyc.id}
-                          className="flex items-center px-3 py-1.5 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          onClick={() => viewDocument(kyc.id)}
+                          className="inline-flex min-w-[122px] items-center justify-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 transition-all hover:border-blue-300 hover:bg-blue-100 hover:shadow-sm"
                         >
-                          {processingId === kyc.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
-                          ) : (
-                            <CheckCircle className="h-4 w-4 mr-1.5" />
-                          )}
-                          Verify
+                          <Eye className="h-4 w-4 mr-1.5" />
+                          View Document
                         </button>
-                        <button
-                          onClick={() => rejectKYC(kyc.id)}
-                          disabled={processingId === kyc.id}
-                          className="flex items-center px-3 py-1.5 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {processingId === kyc.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
-                          ) : (
-                            <XCircle className="h-4 w-4 mr-1.5" />
-                          )}
-                          Reject
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                          Pending
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 p-1 shadow-sm">
+                          <button
+                            onClick={() => verifyKYC(kyc.id)}
+                            disabled={isProcessing}
+                            className="inline-flex min-w-[90px] items-center justify-center rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-all hover:bg-emerald-700 hover:shadow disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {isVerifying ? (
+                              <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
+                            ) : (
+                              <CheckCircle className="h-4 w-4 mr-1.5" />
+                            )}
+                            Verify
+                          </button>
+                          <button
+                            onClick={() => rejectKYC(kyc.id)}
+                            disabled={isProcessing}
+                            className="inline-flex min-w-[86px] items-center justify-center rounded-full border border-red-200 bg-white px-3 py-1.5 text-xs font-semibold text-red-700 transition-all hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {isRejecting ? (
+                              <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
+                            ) : (
+                              <XCircle className="h-4 w-4 mr-1.5" />
+                            )}
+                            Reject
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>

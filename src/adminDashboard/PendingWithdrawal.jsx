@@ -63,6 +63,7 @@ const PendingWithdrawals = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [processingId, setProcessingId] = useState(null);
+  const [processingAction, setProcessingAction] = useState(null);
   const [notification, setNotification] = useState(null);
   const [copiedAddress, setCopiedAddress] = useState(null);
 
@@ -139,6 +140,7 @@ const PendingWithdrawals = () => {
   const approveWithdrawal = async (id) => {
     try {
       setProcessingId(id);
+      setProcessingAction("approve");
 
       const token = getAuthToken();
 
@@ -184,6 +186,7 @@ const PendingWithdrawals = () => {
       showNotification("error", err.message || "Failed to approve withdrawal");
     } finally {
       setProcessingId(null);
+      setProcessingAction(null);
     }
   };
 
@@ -191,6 +194,7 @@ const PendingWithdrawals = () => {
   const rejectWithdrawal = async (id) => {
     try {
       setProcessingId(id);
+      setProcessingAction("reject");
 
       const token = getAuthToken();
 
@@ -236,6 +240,7 @@ const PendingWithdrawals = () => {
       showNotification("error", err.message || "Failed to reject withdrawal");
     } finally {
       setProcessingId(null);
+      setProcessingAction(null);
     }
   };
 
@@ -434,6 +439,11 @@ const PendingWithdrawals = () => {
                     withdrawal.cryptocurrency,
                   );
                   const isCopied = copiedAddress === withdrawal.id;
+                  const isProcessing = processingId === withdrawal.id;
+                  const isApproving =
+                    isProcessing && processingAction === "approve";
+                  const isRejecting =
+                    isProcessing && processingAction === "reject";
 
                   return (
                     <tr key={withdrawal.id} className="hover:bg-gray-50">
@@ -523,13 +533,13 @@ const PendingWithdrawals = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center space-x-2">
+                        <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 p-1 shadow-sm">
                           <button
                             onClick={() => approveWithdrawal(withdrawal.id)}
-                            disabled={processingId === withdrawal.id}
-                            className="flex items-center px-3 py-1.5 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={isProcessing}
+                            className="inline-flex min-w-[96px] items-center justify-center rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-all hover:bg-emerald-700 hover:shadow disabled:cursor-not-allowed disabled:opacity-60"
                           >
-                            {processingId === withdrawal.id ? (
+                            {isApproving ? (
                               <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
                             ) : (
                               <CheckCircle className="h-4 w-4 mr-1.5" />
@@ -538,10 +548,10 @@ const PendingWithdrawals = () => {
                           </button>
                           <button
                             onClick={() => rejectWithdrawal(withdrawal.id)}
-                            disabled={processingId === withdrawal.id}
-                            className="flex items-center px-3 py-1.5 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={isProcessing}
+                            className="inline-flex min-w-[86px] items-center justify-center rounded-full border border-red-200 bg-white px-3 py-1.5 text-xs font-semibold text-red-700 transition-all hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
                           >
-                            {processingId === withdrawal.id ? (
+                            {isRejecting ? (
                               <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
                             ) : (
                               <XCircle className="h-4 w-4 mr-1.5" />
