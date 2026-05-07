@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
+  FaArrowRightFromBracket,
   FaCartShopping,
   FaEnvelope,
   FaGear,
@@ -17,6 +18,7 @@ import {
   FaUser,
   FaWallet,
 } from "react-icons/fa6";
+import UserNav from "./UserNav";
 
 // ── QFS Logo (same as rest of dashboard) ──
 const QFSLogo = ({ size = 44 }) => (
@@ -211,6 +213,12 @@ const Account = () => {
 
   const fmt = (d, opts) =>
     d ? new Date(d).toLocaleDateString("en-US", opts) : "N/A";
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
 
   if (loading) {
     return (
@@ -429,6 +437,38 @@ const Account = () => {
                 </span>
               </div>
             </div>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                padding: "10px 14px",
+                borderRadius: 12,
+                border: "1px solid rgba(239,68,68,0.28)",
+                background: "rgba(239,68,68,0.08)",
+                color: "#F87171",
+                fontSize: 12,
+                fontWeight: 800,
+                cursor: "pointer",
+                transition: "all 0.2s",
+                flexShrink: 0,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(239,68,68,0.14)";
+                e.currentTarget.style.borderColor = "rgba(239,68,68,0.45)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(239,68,68,0.08)";
+                e.currentTarget.style.borderColor = "rgba(239,68,68,0.28)";
+              }}
+            >
+              <FaArrowRightFromBracket style={{ width: 14, height: 14 }} />
+              Logout
+            </button>
           </div>
         </div>
       </div>

@@ -7,7 +7,6 @@ import {
   FaHospital,
   FaLink,
   FaMoneyBillTransfer,
-  FaRegBell,
   FaRegCircleCheck,
   FaRegCircleXmark,
   FaRegClock,
@@ -66,10 +65,6 @@ const tokenCoinGeckoIds = {
   tron: "tron",
 };
 
-const notifications = [
-  { id: 1, message: "Welcome to QFS Ledger!", read: false },
-];
-
 const actionButtons = [
   { to: "/deposit", icon: FaWallet, label: "Deposit" },
   { to: "/withdraw", icon: FaMoneyBillTransfer, label: "Receive" },
@@ -97,7 +92,6 @@ const kycConfig = {
 const UserDashboard = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showNotifications, setShowNotifications] = useState(false);
   const [tokenPrices, setTokenPrices] = useState({});
   const [tokenLogos, setTokenLogos] = useState({});
   const [initialized, setInitialized] = useState(false);
@@ -278,183 +272,146 @@ const UserDashboard = () => {
   }
 
   return (
-    <>
-      <section className="relative mb-6 overflow-hidden rounded-[20px] border border-[#C9A84C]/30 bg-[radial-gradient(circle_at_16%_18%,rgba(240,192,64,0.28),transparent_28%),radial-gradient(circle_at_88%_12%,rgba(56,189,248,0.12),transparent_26%),linear-gradient(135deg,#04090F_0%,#0C1E38_48%,#07111F_100%)] shadow-[0_0_60px_rgba(201,168,76,0.10),inset_0_1px_0_rgba(201,168,76,0.15)]">
-        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.12),transparent_28%,rgba(201,168,76,0.10)_72%,transparent)] opacity-85" />
-        <div className="relative z-[2] h-px bg-[linear-gradient(90deg,transparent,#C9A84C,#F0C040,#C9A84C,transparent)]" />
-        <div className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(rgba(201,168,76,0.16)_1px,transparent_1px),linear-gradient(90deg,rgba(201,168,76,0.12)_1px,transparent_1px)] bg-[length:34px_34px] opacity-10 [mask-image:linear-gradient(135deg,rgba(0,0,0,0.8),transparent_72%)]" />
-        <div className="pointer-events-none absolute -bottom-24 -right-20 z-[1] h-56 w-56 rounded-full border border-[#C9A84C]/15 shadow-[inset_0_0_0_28px_rgba(201,168,76,0.025),inset_0_0_0_56px_rgba(201,168,76,0.02)]" />
+    <div className="-m-3 min-h-[calc(100vh-64px)] bg-[#04090F] text-white sm:-m-4 lg:-m-6">
+      <div className="mx-auto flex w-full max-w-4xl flex-col px-4 pb-28 pt-5 sm:px-6 lg:px-8">
+        <section className="relative mb-7 aspect-[1.9/1] min-h-[210px] overflow-hidden rounded-[28px] border border-[#C9A84C]/25 bg-[linear-gradient(135deg,#07111F_0%,#0C1E38_48%,#04090F_100%)] shadow-[0_18px_50px_rgba(0,0,0,0.35),inset_0_0_0_1px_rgba(255,255,255,0.04)] sm:mx-auto sm:min-h-0 sm:w-full sm:max-w-[520px] lg:max-w-[560px]">
+          <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(201,168,76,0.24)_0%,transparent_34%),linear-gradient(292deg,rgba(92,225,230,0.18)_0%,transparent_38%)]" />
+          <div className="absolute inset-0 opacity-15 [background-image:linear-gradient(rgba(247,228,165,0.16)_1px,transparent_1px),linear-gradient(90deg,rgba(247,228,165,0.12)_1px,transparent_1px)] [background-size:28px_28px]" />
+          <div className="absolute left-0 top-0 h-full w-2/3 bg-[linear-gradient(130deg,rgba(255,255,255,0.12),transparent_42%)]" />
+          <div className="absolute bottom-0 right-0 h-28 w-3/5 skew-x-[-24deg] rounded-tl-[38px] bg-[linear-gradient(120deg,rgba(201,168,76,0.18),rgba(92,225,230,0.12))]" />
 
-        <div className="relative z-[2] px-6 pb-5 pt-6">
-          <div className="mb-5 flex items-center justify-between">
-            <KycBadge status={userData?.kycStatus} />
-
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setShowNotifications((value) => !value)}
-                className="relative flex h-9 w-9 items-center justify-center rounded-full border border-[#C9A84C]/20 bg-[#C9A84C]/10 transition hover:border-[#C9A84C]/40 hover:bg-[#C9A84C]/15"
-              >
-                <FaRegBell className="h-4 w-4 text-[#C9A84C]" />
-                {notifications.some((notification) => !notification.read) && (
-                  <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full border-2 border-[#07111F] bg-red-500" />
-                )}
-              </button>
-
-              {showNotifications && (
-                <div className="absolute right-0 top-11 z-50 w-72 overflow-hidden rounded-2xl border border-[#C9A84C]/20 bg-[#0C1E38] shadow-[0_16px_40px_rgba(0,0,0,0.5)]">
-                  <div className="h-px bg-[linear-gradient(90deg,transparent,#C9A84C,transparent)]" />
-                  <div className="border-b border-[#C9A84C]/10 px-4 py-3">
-                    <p className="m-0 text-sm font-bold text-white">
-                      Notifications
-                    </p>
-                    <p className="mt-0.5 text-xs text-[#3D5A70]">
-                      1 new message
-                    </p>
-                  </div>
-                  <div className="p-3">
-                    {notifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className="flex items-center justify-between rounded-xl border border-[#C9A84C]/10 bg-[#C9A84C]/5 px-3 py-2.5"
-                      >
-                        <p className="m-0 text-sm text-[#C5CDD6]">
-                          {notification.message}
-                        </p>
-                        {!notification.read && (
-                          <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-400" />
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                  <div className="border-t border-[#C9A84C]/10 px-4 py-2.5">
-                    <button
-                      type="button"
-                      onClick={() => setShowNotifications(false)}
-                      className="w-full border-0 bg-transparent text-xs font-semibold text-[#3D5A70] transition hover:text-[#C9A84C]"
-                    >
-                      Close
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.15em] text-[#3D5A70]">
-              Total Portfolio Balance
-            </p>
-            <p className="m-0 text-[clamp(2rem,6vw,2.8rem)] font-black leading-none tracking-[-0.03em] text-white">
-              {formatCurrency(totalBalance)}
-            </p>
-            <div className="mt-2 flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#C9A84C]" />
-              <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#C9A84C]">
-                Quantum-Secured · Live
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div className="mb-6 grid grid-cols-4 gap-2">
-        {actionButtons.map(({ to, icon, label }) => (
-          <Link key={label} to={to} className="group no-underline">
-            <div className="flex flex-col items-center justify-center gap-2 rounded-[14px] border border-[#C9A84C]/20 bg-[#C9A84C]/5 px-3 py-4 transition-all group-hover:border-[#C9A84C]/40 group-hover:bg-[#C9A84C]/10 group-hover:shadow-[0_4px_16px_rgba(201,168,76,0.10)]">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-[#C9A84C]/25 bg-[#C9A84C]/10">
-                {React.createElement(icon, {
-                  className: "h-[18px] w-[18px] text-[#C9A84C]",
-                })}
+          <div className="relative z-[2] flex h-full flex-col justify-between p-6 sm:p-7">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="m-0 text-2xl font-black leading-none text-white sm:text-4xl">
+                  <span className="text-[#C9A84C]">Web3</span> Ledger
+                </p>
+                <p className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#8EB1CE]">
+                  Web3 Asset Wallet
+                </p>
               </div>
-              <span className="text-center text-xs font-semibold text-[#8EB1CE]">
-                {label}
-              </span>
-            </div>
-          </Link>
-        ))}
-      </div>
 
-      <section className="mb-6 overflow-hidden rounded-[20px] border border-[#C9A84C]/10 bg-[linear-gradient(160deg,#0C1C36_0%,#070F1C_100%)]">
-        <div className="h-px bg-[linear-gradient(90deg,transparent,rgba(201,168,76,0.4),transparent)]" />
-        <div className="flex items-center justify-between border-b border-[#C9A84C]/10 px-5 py-4">
-          <div>
-            <p className="m-0 text-sm font-bold text-white">Your Assets</p>
-            <p className="mt-0.5 text-[11px] text-[#3D5A70]">
-              {sortedTokens.length} tokens
-            </p>
+              <div className="flex h-12 w-16 shrink-0 items-center justify-center rounded-xl border border-[#F7E4A5]/30 bg-[#F7E4A5]/10">
+                <div className="grid grid-cols-2 gap-1">
+                  <span className="h-2.5 w-4 rounded-sm bg-[#F7E4A5]/70" />
+                  <span className="h-2.5 w-4 rounded-sm bg-[#F7E4A5]/45" />
+                  <span className="h-2.5 w-4 rounded-sm bg-[#F7E4A5]/45" />
+                  <span className="h-2.5 w-4 rounded-sm bg-[#F7E4A5]/70" />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid max-w-[76%] grid-cols-4 gap-2">
+              <span className="h-2 rounded-full bg-[#F7E4A5]/35" />
+              <span className="h-2 rounded-full bg-[#F7E4A5]/35" />
+              <span className="h-2 rounded-full bg-[#F7E4A5]/35" />
+              <span className="h-2 rounded-full bg-[#F7E4A5]/35" />
+            </div>
+
+            <div className="flex items-end justify-between gap-4">
+              <KycBadge status={userData?.kycStatus} />
+              <p className="m-0 text-right text-xs font-bold uppercase tracking-[0.18em] text-[#8EB1CE]">
+                Wallet ID
+              </p>
+            </div>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#C9A84C]" />
-            <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#3D5A70]">
-              Live prices
+        </section>
+
+        <section className="mb-7">
+          <p className="mb-2 text-lg font-medium text-[#8EB1CE]">Balance</p>
+          <p className="m-0 text-[clamp(3rem,12vw,5.6rem)] font-black leading-none text-white">
+            {formatCurrency(totalBalance)}
+          </p>
+          <div className="mt-4 flex items-center gap-2">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-[#C9A84C]" />
+            <span className="text-xs font-semibold uppercase tracking-[0.1em] text-[#C9A84C]">
+              Live Portfolio
             </span>
           </div>
-        </div>
+        </section>
 
-        <div className="p-3">
-          {sortedTokens.map(({ token, usdBalance, tokenAmount, price }) => (
-            <div
-              key={token}
-              className="mb-1.5 flex items-center justify-between rounded-[14px] border border-[#C9A84C]/5 bg-[#C9A84C]/[0.015] px-3.5 py-3 transition-all hover:border-[#C9A84C]/20 hover:bg-[#C9A84C]/5"
-            >
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#C9A84C]/15 bg-[#04090F]">
-                  {tokenLogos[token] ? (
-                    <img
-                      src={tokenLogos[token]}
-                      alt={token}
-                      className="h-8 w-8 object-contain"
-                    />
-                  ) : (
-                    <span className="text-sm font-extrabold text-[#C9A84C]">
-                      {tokenSymbols[token]?.[0]}
-                    </span>
-                  )}
+        <div className="mb-8 grid grid-cols-4 gap-x-3 gap-y-5 sm:grid-cols-8">
+          {actionButtons.map(({ to, icon, label }) => (
+            <Link key={label} to={to} className="group no-underline">
+              <div className="flex flex-col items-center gap-2.5">
+                <div className="flex h-16 w-full min-w-0 items-center justify-center rounded-[22px] border border-[#C9A84C]/25 bg-[#F7E4A5] text-[#04090F] shadow-[0_12px_28px_rgba(0,0,0,0.18)] transition-all group-hover:-translate-y-0.5 group-hover:bg-white group-hover:shadow-[0_16px_32px_rgba(201,168,76,0.16)] sm:h-14">
+                  {React.createElement(icon, {
+                    className: "h-6 w-6",
+                  })}
                 </div>
-                <div>
-                  <p className="m-0 text-sm font-bold text-white">
-                    {tokenDisplayNames[token]}
-                  </p>
-                  <p className="mt-0.5 text-[11px] tabular-nums text-[#3D5A70]">
-                    {tokenAmount}{" "}
-                    <span className="text-[#2E4A60]">
-                      {tokenSymbols[token]}
-                    </span>
-                  </p>
-                </div>
-              </div>
-
-              <div className="text-right">
-                <p className="m-0 text-sm font-bold tabular-nums text-white">
-                  {formatCurrency(usdBalance)}
-                </p>
-                <p className="mt-0.5 text-[11px] tabular-nums text-[#3D5A70]">
-                  {price > 0 ? formatCurrency(price) : "—"}
-                </p>
-                <span
-                  className={`mt-1 inline-flex rounded-full border px-2 py-0.5 text-[10px] font-bold ${
-                    usdBalance > 0
-                      ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-400"
-                      : "border-[#C9A84C]/10 bg-[#C9A84C]/5 text-[#2E4A60]"
-                  }`}
-                >
-                  {usdBalance > 0 ? "Active" : "Empty"}
+                <span className="max-w-full truncate text-center text-xs font-semibold text-[#8EB1CE]">
+                  {label}
                 </span>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
-      </section>
 
-      <div className="mb-20 flex items-start gap-3 rounded-[14px] border border-[#C9A84C]/10 bg-[#C9A84C]/5 px-4 py-3.5">
-        <FaShieldHalved className="mt-0.5 h-[18px] w-[18px] shrink-0 text-[#C9A84C]" />
-        <p className="m-0 text-xs leading-5 text-[#3D5A70]">
-          All assets are protected by quantum-resistant encryption and FRA fund
-          recovery system. Prices update every 5 hours.
-        </p>
+        <section className="mb-6">
+          <div className="mb-4 flex items-end justify-between">
+            <div>
+              <h2 className="m-0 text-3xl font-black leading-none text-white">
+                Tokens
+              </h2>
+              <p className="mt-2 text-xs font-medium text-[#3D5A70]">
+                {sortedTokens.length} assets in your wallet
+              </p>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#C9A84C]" />
+              <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#8EB1CE]">
+                Live prices
+              </span>
+            </div>
+          </div>
+
+          <div className="divide-y divide-[#C9A84C]/10">
+            {sortedTokens.map(({ token, usdBalance, tokenAmount }) => (
+              <div
+                key={token}
+                className="flex items-center justify-between gap-4 py-5 transition-colors hover:bg-[#C9A84C]/[0.03]"
+              >
+                <div className="flex min-w-0 items-center gap-4">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-black ring-1 ring-[#C9A84C]/15">
+                    {tokenLogos[token] ? (
+                      <img
+                        src={tokenLogos[token]}
+                        alt={token}
+                        className="h-full w-full rounded-full bg-black object-contain p-2"
+                      />
+                    ) : (
+                      <span className="text-xl font-black text-[#F0C040]">
+                        {tokenSymbols[token]?.[0]}
+                      </span>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="m-0 truncate text-xl font-semibold text-white">
+                      {tokenDisplayNames[token]}
+                    </p>
+                    <p className="mt-1 truncate text-sm font-medium tabular-nums text-[#8EB1CE]">
+                      {tokenAmount} {tokenSymbols[token]}
+                    </p>
+                  </div>
+                </div>
+
+                <p className="m-0 shrink-0 text-right text-xl font-semibold tabular-nums text-white">
+                  {formatCurrency(usdBalance)}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <div className="flex items-start gap-3 rounded-[18px] border border-[#C9A84C]/10 bg-[#C9A84C]/5 px-4 py-3.5">
+          <FaShieldHalved className="mt-0.5 h-[18px] w-[18px] shrink-0 text-[#C9A84C]" />
+          <p className="m-0 text-xs leading-5 text-[#8EB1CE]">
+            All assets are protected by quantum-resistant encryption and FRA
+            fund recovery system. Prices update every 5 hours.
+          </p>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 
