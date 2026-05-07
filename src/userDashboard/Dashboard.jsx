@@ -223,7 +223,10 @@ const UserDashboard = () => {
   };
 
   const totalBalance = userData?.wallet?.balances
-    ? Object.values(userData.wallet.balances).reduce((sum, value) => sum + value, 0)
+    ? Object.values(userData.wallet.balances).reduce(
+        (sum, value) => sum + value,
+        0,
+      )
     : 0;
 
   const sortedTokens = userData?.wallet?.balances
@@ -238,12 +241,11 @@ const UserDashboard = () => {
     : [];
 
   const KycBadge = ({ status }) => {
-    const cfg =
-      kycConfig[status] || {
-        icon: FaRegCircleXmark,
-        label: "KYC Required",
-        className: "border-red-400/25 bg-red-400/10 text-red-400",
-      };
+    const cfg = kycConfig[status] || {
+      icon: FaRegCircleXmark,
+      label: "KYC Required",
+      className: "border-red-400/25 bg-red-400/10 text-red-400",
+    };
 
     return (
       <div
@@ -366,7 +368,7 @@ const UserDashboard = () => {
           </div>
 
           <div className="divide-y divide-[#C9A84C]/10">
-            {sortedTokens.map(({ token, usdBalance, tokenAmount }) => (
+            {sortedTokens.map(({ token, usdBalance, tokenAmount, price }) => (
               <div
                 key={token}
                 className="flex items-center justify-between gap-4 py-5 transition-colors hover:bg-[#C9A84C]/[0.03]"
@@ -395,21 +397,26 @@ const UserDashboard = () => {
                   </div>
                 </div>
 
-                <p className="m-0 shrink-0 text-right text-xl font-semibold tabular-nums text-white">
-                  {formatCurrency(usdBalance)}
-                </p>
+                <div className="shrink-0 text-right">
+                  <p className="m-0 text-xl font-semibold tabular-nums text-white">
+                    {formatCurrency(usdBalance)}
+                  </p>
+                  <p className="mt-1 text-xs font-medium tabular-nums text-[#8EB1CE]">
+                    {price > 0 ? formatCurrency(price) : "Price loading"}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
         </section>
 
-        <div className="flex items-start gap-3 rounded-[18px] border border-[#C9A84C]/10 bg-[#C9A84C]/5 px-4 py-3.5">
+        {/* <div className="flex items-start gap-3 rounded-[18px] border border-[#C9A84C]/10 bg-[#C9A84C]/5 px-4 py-3.5">
           <FaShieldHalved className="mt-0.5 h-[18px] w-[18px] shrink-0 text-[#C9A84C]" />
           <p className="m-0 text-xs leading-5 text-[#8EB1CE]">
             All assets are protected by quantum-resistant encryption and FRA
             fund recovery system. Prices update every 5 hours.
           </p>
-        </div>
+        </div> */}
       </div>
     </div>
   );
