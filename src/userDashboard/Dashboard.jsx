@@ -275,39 +275,39 @@ const UserDashboard = () => {
 
   return (
     <div className="-m-3 min-h-[calc(100vh-64px)] bg-[#04090F] text-white sm:-m-4 lg:-m-6">
-      <div className="mx-auto flex w-full max-w-4xl flex-col px-4 pb-28 pt-5 sm:px-6 lg:px-8">
-        <section className="relative mb-7 aspect-[1.9/1] min-h-[210px] overflow-hidden rounded-[28px] border border-[#C9A84C]/25 bg-[linear-gradient(135deg,#07111F_0%,#0C1E38_48%,#04090F_100%)] shadow-[0_18px_50px_rgba(0,0,0,0.35),inset_0_0_0_1px_rgba(255,255,255,0.04)] sm:mx-auto sm:min-h-0 sm:w-full sm:max-w-[520px] lg:max-w-[560px]">
+      <div className="mx-auto flex w-full max-w-3xl flex-col px-4 pb-24 pt-4 sm:px-5 lg:px-6">
+        <section className="relative mb-5 aspect-[1.9/1] min-h-[180px] overflow-hidden rounded-[22px] border border-[#C9A84C]/25 bg-[linear-gradient(135deg,#07111F_0%,#0C1E38_48%,#04090F_100%)] shadow-[0_14px_38px_rgba(0,0,0,0.32),inset_0_0_0_1px_rgba(255,255,255,0.04)] sm:mx-auto sm:min-h-0 sm:w-full sm:max-w-[460px] lg:max-w-[500px]">
           <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(201,168,76,0.24)_0%,transparent_34%),linear-gradient(292deg,rgba(92,225,230,0.18)_0%,transparent_38%)]" />
           <div className="absolute inset-0 opacity-15 [background-image:linear-gradient(rgba(247,228,165,0.16)_1px,transparent_1px),linear-gradient(90deg,rgba(247,228,165,0.12)_1px,transparent_1px)] [background-size:28px_28px]" />
           <div className="absolute left-0 top-0 h-full w-2/3 bg-[linear-gradient(130deg,rgba(255,255,255,0.12),transparent_42%)]" />
-          <div className="absolute bottom-0 right-0 h-28 w-3/5 skew-x-[-24deg] rounded-tl-[38px] bg-[linear-gradient(120deg,rgba(201,168,76,0.18),rgba(92,225,230,0.12))]" />
+          <div className="absolute bottom-0 right-0 h-24 w-3/5 skew-x-[-24deg] rounded-tl-[32px] bg-[linear-gradient(120deg,rgba(201,168,76,0.18),rgba(92,225,230,0.12))]" />
 
-          <div className="relative z-[2] flex h-full flex-col justify-between p-6 sm:p-7">
+          <div className="relative z-[2] flex h-full flex-col justify-between p-5 sm:p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="m-0 text-2xl font-black leading-none text-white sm:text-4xl">
+                <p className="m-0 text-[1.35rem] font-black leading-none text-white sm:text-3xl">
                   <span className="text-[#C9A84C]">Web3</span> Ledger
                 </p>
-                <p className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#8EB1CE]">
+                <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#8EB1CE] sm:text-xs">
                   Web3 Asset Wallet
                 </p>
               </div>
 
-              <div className="flex h-12 w-16 shrink-0 items-center justify-center rounded-xl border border-[#F7E4A5]/30 bg-[#F7E4A5]/10">
+              <div className="flex h-10 w-14 shrink-0 items-center justify-center rounded-lg border border-[#F7E4A5]/30 bg-[#F7E4A5]/10">
                 <div className="grid grid-cols-2 gap-1">
-                  <span className="h-2.5 w-4 rounded-sm bg-[#F7E4A5]/70" />
-                  <span className="h-2.5 w-4 rounded-sm bg-[#F7E4A5]/45" />
-                  <span className="h-2.5 w-4 rounded-sm bg-[#F7E4A5]/45" />
-                  <span className="h-2.5 w-4 rounded-sm bg-[#F7E4A5]/70" />
+                  <span className="h-2 w-3.5 rounded-sm bg-[#F7E4A5]/70" />
+                  <span className="h-2 w-3.5 rounded-sm bg-[#F7E4A5]/45" />
+                  <span className="h-2 w-3.5 rounded-sm bg-[#F7E4A5]/45" />
+                  <span className="h-2 w-3.5 rounded-sm bg-[#F7E4A5]/70" />
                 </div>
               </div>
             </div>
 
-            <div className="grid max-w-[76%] grid-cols-4 gap-2">
-              <span className="h-2 rounded-full bg-[#F7E4A5]/35" />
-              <span className="h-2 rounded-full bg-[#F7E4A5]/35" />
-              <span className="h-2 rounded-full bg-[#F7E4A5]/35" />
-              <span className="h-2 rounded-full bg-[#F7E4A5]/35" />
+            <div className="grid max-w-[70%] grid-cols-4 gap-1.5">
+              <span className="h-1.5 rounded-full bg-[#F7E4A5]/35" />
+              <span className="h-1.5 rounded-full bg-[#F7E4A5]/35" />
+              <span className="h-1.5 rounded-full bg-[#F7E4A5]/35" />
+              <span className="h-1.5 rounded-full bg-[#F7E4A5]/35" />
             </div>
 
             <div className="flex items-end justify-between gap-4">
@@ -319,29 +319,29 @@ const UserDashboard = () => {
           </div>
         </section>
 
-        <section className="mb-7">
-          <p className="mb-2 text-lg font-medium text-[#8EB1CE]">Balance</p>
-          <p className="m-0 text-[clamp(3rem,12vw,5.6rem)] font-black leading-none text-white">
+        <section className="mb-6">
+          <p className="mb-1.5 text-base font-medium text-[#8EB1CE]">Balance</p>
+          <p className="m-0 text-[clamp(2.35rem,10vw,4.5rem)] font-black leading-none text-white">
             {formatCurrency(totalBalance)}
           </p>
-          <div className="mt-4 flex items-center gap-2">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-[#C9A84C]" />
-            <span className="text-xs font-semibold uppercase tracking-[0.1em] text-[#C9A84C]">
+          <div className="mt-3 flex items-center gap-2">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#C9A84C]" />
+            <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#C9A84C]">
               Live Portfolio
             </span>
           </div>
         </section>
 
-        <div className="mb-8 grid grid-cols-4 gap-x-3 gap-y-5 sm:grid-cols-8">
+        <div className="mb-7 grid grid-cols-4 gap-x-2.5 gap-y-4 sm:grid-cols-8">
           {actionButtons.map(({ to, icon, label }) => (
             <Link key={label} to={to} className="group no-underline">
-              <div className="flex flex-col items-center gap-2.5">
-                <div className="flex h-16 w-full min-w-0 items-center justify-center rounded-[22px] border border-[#C9A84C]/25 bg-[#F7E4A5] text-[#04090F] shadow-[0_12px_28px_rgba(0,0,0,0.18)] transition-all group-hover:-translate-y-0.5 group-hover:bg-white group-hover:shadow-[0_16px_32px_rgba(201,168,76,0.16)] sm:h-14">
+              <div className="flex flex-col items-center gap-2">
+                <div className="flex h-13 w-full min-w-0 items-center justify-center rounded-[17px] border border-[#C9A84C]/25 bg-[#F7E4A5] text-[#04090F] shadow-[0_10px_22px_rgba(0,0,0,0.16)] transition-all group-hover:-translate-y-0.5 group-hover:bg-white group-hover:shadow-[0_14px_28px_rgba(201,168,76,0.14)] sm:h-12">
                   {React.createElement(icon, {
-                    className: "h-6 w-6",
+                    className: "h-5 w-5",
                   })}
                 </div>
-                <span className="max-w-full truncate text-center text-xs font-semibold text-[#8EB1CE]">
+                <span className="max-w-full truncate text-center text-[11px] font-semibold text-[#8EB1CE]">
                   {label}
                 </span>
               </div>
@@ -350,12 +350,12 @@ const UserDashboard = () => {
         </div>
 
         <section className="mb-6">
-          <div className="mb-4 flex items-end justify-between">
+          <div className="mb-3 flex items-end justify-between">
             <div>
-              <h2 className="m-0 text-3xl font-black leading-none text-white">
+              <h2 className="m-0 text-2xl font-black leading-none text-white">
                 Tokens
               </h2>
-              <p className="mt-2 text-xs font-medium text-[#3D5A70]">
+              <p className="mt-1.5 text-[11px] font-medium text-[#3D5A70]">
                 {sortedTokens.length} assets in your wallet
               </p>
             </div>
@@ -371,10 +371,10 @@ const UserDashboard = () => {
             {sortedTokens.map(({ token, usdBalance, tokenAmount, price }) => (
               <div
                 key={token}
-                className="flex items-center justify-between gap-4 py-5 transition-colors hover:bg-[#C9A84C]/[0.03]"
+                className="flex items-center justify-between gap-3 py-4 transition-colors hover:bg-[#C9A84C]/[0.03]"
               >
-                <div className="flex min-w-0 items-center gap-4">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-black ring-1 ring-[#C9A84C]/15">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-black ring-1 ring-[#C9A84C]/15">
                     {tokenLogos[token] ? (
                       <img
                         src={tokenLogos[token]}
@@ -388,20 +388,20 @@ const UserDashboard = () => {
                     )}
                   </div>
                   <div className="min-w-0">
-                    <p className="m-0 truncate text-xl font-semibold text-white">
+                    <p className="m-0 truncate text-lg font-semibold text-white">
                       {tokenDisplayNames[token]}
                     </p>
-                    <p className="mt-1 truncate text-sm font-medium tabular-nums text-[#8EB1CE]">
+                    <p className="mt-0.5 truncate text-xs font-medium tabular-nums text-[#8EB1CE]">
                       {tokenAmount} {tokenSymbols[token]}
                     </p>
                   </div>
                 </div>
 
                 <div className="shrink-0 text-right">
-                  <p className="m-0 text-xl font-semibold tabular-nums text-white">
+                  <p className="m-0 text-lg font-semibold tabular-nums text-white">
                     {formatCurrency(usdBalance)}
                   </p>
-                  <p className="mt-1 text-xs font-medium tabular-nums text-[#8EB1CE]">
+                  <p className="mt-0.5 text-[11px] font-medium tabular-nums text-[#8EB1CE]">
                     {price > 0 ? formatCurrency(price) : "Price loading"}
                   </p>
                 </div>
