@@ -33,6 +33,7 @@ import Minning from "./userDashboard/Minning.jsx";
 import Investment from "./userDashboard/Investment.jsx";
 import Staking from "./adminDashboard/Staking.jsx";
 import BuyCrypto from "./userDashboard/BuyCrypto.jsx";
+import TokenDetails from "./userDashboard/TokenDetails.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -47,6 +48,16 @@ createRoot(document.getElementById("root")).render(
             <ProtectedRoute>
               <DashboardLayout>
                 <UserDashboard />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/token/:tokenId"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <TokenDetails />
               </DashboardLayout>
             </ProtectedRoute>
           }

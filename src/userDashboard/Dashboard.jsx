@@ -14,56 +14,15 @@ import {
   FaShieldHalved,
   FaWallet,
 } from "react-icons/fa6";
+import {
+  tokenCoinGeckoIds,
+  tokenDisplayNames,
+  tokenIds,
+  tokenPrecision,
+  tokenSymbols,
+} from "./tokenConfig";
 
 const PRICE_FETCH_INTERVAL = 5 * 60 * 60 * 1000;
-
-const tokenIds = {
-  bitcoin: "bitcoin",
-  ethereum: "ethereum",
-  tether: "tether",
-  "binance-coin": "binancecoin",
-  solana: "solana",
-  dogecoin: "dogecoin",
-  ripple: "ripple",
-  stellar: "stellar",
-  tron: "tron",
-};
-
-const tokenDisplayNames = {
-  bitcoin: "Bitcoin",
-  ethereum: "Ethereum",
-  tether: "Tether",
-  "binance-coin": "Binance Coin",
-  solana: "Solana",
-  dogecoin: "Dogecoin",
-  ripple: "Ripple",
-  stellar: "Stellar",
-  tron: "Tron",
-};
-
-const tokenSymbols = {
-  bitcoin: "BTC",
-  ethereum: "ETH",
-  tether: "USDT",
-  "binance-coin": "BNB",
-  solana: "SOL",
-  dogecoin: "DOGE",
-  ripple: "XRP",
-  stellar: "XLM",
-  tron: "TRX",
-};
-
-const tokenCoinGeckoIds = {
-  bitcoin: "bitcoin",
-  ethereum: "ethereum",
-  tether: "tether",
-  "binance-coin": "binancecoin",
-  solana: "solana",
-  dogecoin: "dogecoin",
-  ripple: "ripple",
-  stellar: "stellar",
-  tron: "tron",
-};
 
 const actionButtons = [
   { to: "/deposit", icon: FaWallet, label: "Deposit" },
@@ -208,18 +167,7 @@ const UserDashboard = () => {
 
   const formatTokenAmount = (amount, token) => {
     if (!amount) return "0";
-    const precision = {
-      bitcoin: 6,
-      ethereum: 4,
-      tether: 2,
-      "binance-coin": 4,
-      solana: 2,
-      dogecoin: 0,
-      ripple: 0,
-      stellar: 0,
-      tron: 0,
-    };
-    return parseFloat(amount).toFixed(precision[token] ?? 4);
+    return parseFloat(amount).toFixed(tokenPrecision[token] ?? 4);
   };
 
   const totalBalance = userData?.wallet?.balances
@@ -369,9 +317,10 @@ const UserDashboard = () => {
 
           <div className="divide-y divide-[#C9A84C]/10">
             {sortedTokens.map(({ token, usdBalance, tokenAmount, price }) => (
-              <div
+              <Link
                 key={token}
-                className="flex items-center justify-between gap-3 py-4 transition-colors hover:bg-[#C9A84C]/[0.03]"
+                to={`/token/${token}`}
+                className="flex items-center justify-between gap-3 py-4 text-inherit no-underline transition-colors hover:bg-[#C9A84C]/[0.03]"
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-black ring-1 ring-[#C9A84C]/15">
@@ -401,11 +350,18 @@ const UserDashboard = () => {
                   <p className="m-0 text-lg font-semibold tabular-nums text-white">
                     {formatCurrency(usdBalance)}
                   </p>
-                  <p className="mt-0.5 text-[11px] font-medium tabular-nums text-[#8EB1CE]">
-                    {price > 0 ? formatCurrency(price) : "Price loading"}
-                  </p>
+                  {price > 0 ? (
+                    <p className="mt-0.5 text-[11px] font-medium tabular-nums text-[#8EB1CE]">
+                      {formatCurrency(price)}
+                    </p>
+                  ) : (
+                    <div
+                      aria-label="Loading token price"
+                      className="ml-auto mt-1.5 h-2.5 w-14 animate-pulse rounded-full bg-[#8EB1CE]/20"
+                    />
+                  )}
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </section>
