@@ -9,6 +9,7 @@ import {
   InformationCircleIcon,
   ChevronDownIcon,
 } from "@heroicons/react/24/outline";
+import { InlineSkeletonPage } from "./Skeletons";
 
 const cryptoOptions = [
   { id: "bitcoin", name: "Bitcoin", symbol: "BTC", icon: "₿" },
@@ -220,50 +221,7 @@ const Withdraw = () => {
 
   // ── Loading ──
   if (loading && Object.keys(userBalances).length === 0) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: 320,
-        }}
-      >
-        <div style={{ textAlign: "center" }}>
-          <div
-            style={{
-              position: "relative",
-              width: 56,
-              height: 56,
-              margin: "0 auto 16px",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                borderRadius: "50%",
-                border: "3px solid rgba(201,168,76,0.1)",
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                borderRadius: "50%",
-                border: "3px solid transparent",
-                borderTopColor: "#C9A84C",
-                animation: "spin 0.9s linear infinite",
-              }}
-            />
-          </div>
-          <p style={{ fontSize: 13, color: "#3D5A70", fontWeight: 500 }}>
-            Loading your balances…
-          </p>
-        </div>
-        <style>{`@keyframes spin { to { transform:rotate(360deg); } }`}</style>
-      </div>
-    );
+    return <InlineSkeletonPage type="balanceForm" />;
   }
 
   return (

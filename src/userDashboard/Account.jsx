@@ -18,6 +18,7 @@ import {
   FaWallet,
 } from "react-icons/fa6";
 import UserNav from "./UserNav";
+import { InlineSkeletonPage } from "./Skeletons";
 
 // ── QFS Logo (same as rest of dashboard) ──
 const QFSLogo = ({ size = 44 }) => (
@@ -214,50 +215,7 @@ const Account = () => {
     d ? new Date(d).toLocaleDateString("en-US", opts) : "N/A";
 
   if (loading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: 320,
-        }}
-      >
-        <div style={{ textAlign: "center" }}>
-          <div
-            style={{
-              position: "relative",
-              width: 56,
-              height: 56,
-              margin: "0 auto 16px",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                borderRadius: "50%",
-                border: "3px solid rgba(201,168,76,0.1)",
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                borderRadius: "50%",
-                border: "3px solid transparent",
-                borderTopColor: "#C9A84C",
-                animation: "spin 0.9s linear infinite",
-              }}
-            />
-          </div>
-          <p style={{ fontSize: 13, color: "#3D5A70", fontWeight: 500 }}>
-            Loading your account…
-          </p>
-        </div>
-        <style>{`@keyframes spin { to { transform:rotate(360deg); } }`}</style>
-      </div>
-    );
+    return <InlineSkeletonPage type="account" />;
   }
 
   const kyc = getKyc(userData?.kycStatus);
@@ -905,8 +863,6 @@ const Account = () => {
           </div>
         </div>
       </div>
-
-      <style>{`@keyframes spin { to { transform:rotate(360deg); } }`}</style>
     </div>
   );
 };

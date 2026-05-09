@@ -12,6 +12,7 @@ import {
   PlusIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { InvestmentSkeleton } from "./Skeletons";
 
 const API_BASE = "https://sukwi-be.onrender.com/api";
 
@@ -255,16 +256,7 @@ export default function Investment() {
   ];
 
   if (loading) {
-    return (
-      <div className="flex min-h-80 items-center justify-center">
-        <div className="text-center">
-          <div className="mx-auto mb-4 h-14 w-14 animate-spin rounded-full border-[3px] border-[#C9A84C]/15 border-t-[#C9A84C]" />
-          <p className="text-sm font-medium text-[#3D5A70]">
-            Loading investments...
-          </p>
-        </div>
-      </div>
-    );
+    return <InvestmentSkeleton />;
   }
 
   return (

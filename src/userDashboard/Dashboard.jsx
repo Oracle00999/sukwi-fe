@@ -21,6 +21,7 @@ import {
   tokenPrecision,
   tokenSymbols,
 } from "./tokenConfig";
+import { DashboardSkeleton } from "./Skeletons";
 
 const PRICE_FETCH_INTERVAL = 5 * 60 * 60 * 1000;
 
@@ -206,19 +207,7 @@ const UserDashboard = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex min-h-80 items-center justify-center">
-        <div className="text-center">
-          <div className="relative mx-auto mb-4 h-14 w-14">
-            <div className="absolute inset-0 rounded-full border-[3px] border-[#C9A84C]/10" />
-            <div className="absolute inset-0 animate-spin rounded-full border-[3px] border-transparent border-t-[#C9A84C]" />
-          </div>
-          <p className="text-sm font-medium text-[#3D5A70]">
-            Loading your wallet...
-          </p>
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   return (

@@ -14,7 +14,7 @@ import {
   tokenSymbols,
 } from "./tokenConfig";
 
-const chartWindow = "7D";
+const chartWindow = "1D";
 
 const formatCurrency = (value, compact = false) => {
   const amount = Number(value) || 0;
@@ -33,7 +33,42 @@ const formatTokenAmount = (amount, token) => {
   return parseFloat(amount).toFixed(tokenPrecision[token] ?? 4);
 };
 
-const SimplePriceChart = ({ prices }) => {
+const SkeletonBlock = ({ className = "" }) => (
+  <div
+    className={`animate-pulse rounded-full bg-[#8EB1CE]/15 ${className}`}
+    aria-hidden="true"
+  />
+);
+
+const ChartSkeleton = () => (
+  <div
+    className="h-44 overflow-hidden rounded-[18px] border border-[#C9A84C]/10 bg-[#C9A84C]/[0.03] p-3"
+    aria-label="Loading chart"
+  >
+    <div className="flex h-full flex-col justify-between">
+      {[0, 1, 2, 3].map((line) => (
+        <div key={line} className="h-px w-full bg-[#8EB1CE]/10" />
+      ))}
+    </div>
+    <div className="-mt-24 flex items-end gap-2">
+      {[28, 56, 42, 82, 62, 96, 74, 112, 90].map((height, index) => (
+        <div
+          key={index}
+          className="w-full animate-pulse rounded-t-full bg-[#C9A84C]/20"
+          style={{ height }}
+        />
+      ))}
+    </div>
+  </div>
+);
+
+const UnavailableText = ({ children, className = "" }) => (
+  <p className={`m-0 text-sm font-semibold text-[#8EB1CE] ${className}`}>
+    {children}
+  </p>
+);
+
+const SimplePriceChart = ({ prices, isLoading, hasError }) => {
   const points = useMemo(() => {
     if (!prices?.length) return [];
 
@@ -54,10 +89,12 @@ const SimplePriceChart = ({ prices }) => {
     });
   }, [prices]);
 
-  if (points.length < 2) {
+  if (isLoading) return <ChartSkeleton />;
+
+  if (hasError || points.length < 2) {
     return (
-      <div className="flex h-44 items-center justify-center rounded-[18px] border border-[#C9A84C]/10 bg-[#C9A84C]/[0.03] text-xs font-semibold uppercase tracking-[0.12em] text-[#3D5A70]">
-        Chart loading
+      <div className="flex h-44 items-center justify-center rounded-[18px] border border-[#C9A84C]/10 bg-[#C9A84C]/[0.03] px-4 text-center">
+        <UnavailableText>Chart unavailable</UnavailableText>
       </div>
     );
   }
@@ -112,95 +149,125 @@ const SimplePriceChart = ({ prices }) => {
 const TokenDetails = () => {
   const { tokenId } = useParams();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
-  const [price, setPrice] = useState(0);
+  const [price, setPrice] = useState(null);
   const [logo, setLogo] = useState("");
   const [chartPrices, setChartPrices] = useState([]);
-  const [error, setError] = useState("");
+  const [userLoaded, setUserLoaded] = useState(false);
+  const [marketLoaded, setMarketLoaded] = useState(false);
+  const [chartLoaded, setChartLoaded] = useState(false);
+  const [loadErrors, setLoadErrors] = useState({
+    user: false,
+    market: false,
+    chart: false,
+  });
 
   const coinId = tokenCoinGeckoIds[tokenId];
 
   useEffect(() => {
-    const fetchDetails = async () => {
-      if (!coinId) return;
+    if (!coinId) return undefined;
 
-      setLoading(true);
-      setError("");
+    let isActive = true;
+    const token = localStorage.getItem("token");
 
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          navigate("/login");
-          return;
+    Promise.resolve().then(() => {
+      if (!isActive) return;
+      setUserData(null);
+      setPrice(null);
+      setLogo("");
+      setChartPrices([]);
+      setUserLoaded(false);
+      setMarketLoaded(false);
+      setChartLoaded(false);
+      setLoadErrors({ user: false, market: false, chart: false });
+    });
+
+    if (!token) {
+      navigate("/login");
+      return undefined;
+    }
+
+    fetch("https://sukwi-be.onrender.com/api/auth/me", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json().then((payload) => ({ res, payload })))
+      .then(({ res, payload }) => {
+        if (!isActive) return;
+        if (!res.ok || !payload.success) {
+          throw new Error("User request failed");
         }
-
-        const [userRes, marketRes, chartRes] = await Promise.all([
-          fetch("https://sukwi-be.onrender.com/api/auth/me", {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }),
-          fetch(
-            `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${coinId}&per_page=1&sparkline=false`,
-          ),
-          fetch(
-            `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=7`,
-          ),
-        ]);
-
-        const userPayload = await userRes.json();
-        if (userRes.ok && userPayload.success) {
-          setUserData(userPayload.data.user);
+        setUserData(payload.data.user);
+      })
+      .catch(() => {
+        if (isActive) {
+          setLoadErrors((prev) => ({ ...prev, user: true }));
         }
+      })
+      .finally(() => {
+        if (isActive) setUserLoaded(true);
+      });
 
-        if (marketRes.ok) {
-          const marketPayload = await marketRes.json();
-          const market = marketPayload?.[0];
-          setPrice(market?.current_price || 0);
-          setLogo(market?.image || "");
+    fetch(
+      `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${coinId}&per_page=1&sparkline=false`,
+    )
+      .then((res) => (res.ok ? res.json() : []))
+      .then((payload) => {
+        if (!isActive) return;
+        const market = payload?.[0];
+        if (!market) {
+          throw new Error("Market request failed");
         }
+        setPrice(market?.current_price ?? 0);
+        setLogo(market?.image || "");
+      })
+      .catch(() => {
+        if (isActive) {
+          setLoadErrors((prev) => ({ ...prev, market: true }));
+        }
+      })
+      .finally(() => {
+        if (isActive) setMarketLoaded(true);
+      });
 
-        if (chartRes.ok) {
-          const chartPayload = await chartRes.json();
-          setChartPrices(chartPayload?.prices || []);
+    fetch(
+      `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=1`,
+    )
+      .then((res) => (res.ok ? res.json() : {}))
+      .then((payload) => {
+        if (!isActive) return;
+        if (!payload?.prices?.length) {
+          throw new Error("Chart request failed");
         }
-      } catch {
-        setError("Unable to load this asset right now.");
-      } finally {
-        setLoading(false);
-      }
+        setChartPrices(payload.prices);
+      })
+      .catch(() => {
+        if (isActive) {
+          setLoadErrors((prev) => ({ ...prev, chart: true }));
+        }
+      })
+      .finally(() => {
+        if (isActive) setChartLoaded(true);
+      });
+
+    return () => {
+      isActive = false;
     };
-
-    fetchDetails();
   }, [coinId, navigate]);
 
   if (!coinId) return <Navigate to="/dashboard" replace />;
 
-  const usdBalance = userData?.wallet?.balances?.[tokenId] || 0;
-  const tokenAmount = price > 0 ? usdBalance / price : 0;
+  const usdBalance = userLoaded ? userData?.wallet?.balances?.[tokenId] || 0 : 0;
+  const tokenAmount = marketLoaded && price > 0 ? usdBalance / price : 0;
   const firstChartPrice = chartPrices?.[0]?.[1] || 0;
   const changePercent =
-    firstChartPrice > 0 && price > 0
+    chartLoaded && marketLoaded && firstChartPrice > 0 && price > 0
       ? ((price - firstChartPrice) / firstChartPrice) * 100
       : 0;
   const isPositive = changePercent >= 0;
-
-  if (loading) {
-    return (
-      <div className="flex min-h-80 items-center justify-center">
-        <div className="text-center">
-          <div className="relative mx-auto mb-4 h-12 w-12">
-            <div className="absolute inset-0 rounded-full border-[3px] border-[#C9A84C]/10" />
-            <div className="absolute inset-0 animate-spin rounded-full border-[3px] border-transparent border-t-[#C9A84C]" />
-          </div>
-          <p className="text-sm font-medium text-[#3D5A70]">Loading asset...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="-m-3 min-h-[calc(100vh-64px)] bg-[#04090F] text-white sm:-m-4 lg:-m-6">
@@ -222,12 +289,6 @@ const TokenDetails = () => {
             </p>
           </div>
         </div>
-
-        {error && (
-          <div className="mb-4 rounded-[14px] border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm font-semibold text-red-300">
-            {error}
-          </div>
-        )}
 
         <section className="mb-5 overflow-hidden rounded-[22px] border border-[#C9A84C]/15 bg-[linear-gradient(160deg,#0C1C36_0%,#070F1C_100%)]">
           <div className="h-px bg-[linear-gradient(90deg,transparent,rgba(201,168,76,0.45),transparent)]" />
@@ -251,25 +312,45 @@ const TokenDetails = () => {
                   <p className="m-0 text-sm font-semibold text-[#8EB1CE]">
                     Current price
                   </p>
-                  <p className="mt-1 text-3xl font-black leading-none text-white">
-                    {formatCurrency(price)}
-                  </p>
+                  {!marketLoaded ? (
+                    <SkeletonBlock className="mt-2 h-8 w-32" />
+                  ) : loadErrors.market ? (
+                    <UnavailableText className="mt-2">
+                      Price unavailable
+                    </UnavailableText>
+                  ) : (
+                    <p className="mt-1 text-3xl font-black leading-none text-white">
+                      {formatCurrency(price)}
+                    </p>
+                  )}
                 </div>
               </div>
 
-              <div
-                className={`flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-bold ${
-                  isPositive
-                    ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-400"
-                    : "border-red-400/20 bg-red-400/10 text-red-300"
-                }`}
-              >
-                <FaArrowTrendUp className="h-3 w-3" />
-                {Math.abs(changePercent).toFixed(2)}%
-              </div>
+              {!marketLoaded || !chartLoaded ? (
+                <SkeletonBlock className="h-7 w-16 shrink-0" />
+              ) : loadErrors.market || loadErrors.chart ? (
+                <div className="flex shrink-0 items-center rounded-full border border-[#C9A84C]/15 bg-[#C9A84C]/5 px-2.5 py-1 text-xs font-bold text-[#8EB1CE]">
+                  1D unavailable
+                </div>
+              ) : (
+                <div
+                  className={`flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-bold ${
+                    isPositive
+                      ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-400"
+                      : "border-red-400/20 bg-red-400/10 text-red-300"
+                  }`}
+                >
+                  <FaArrowTrendUp className="h-3 w-3" />
+                  {Math.abs(changePercent).toFixed(2)}%
+                </div>
+              )}
             </div>
 
-            <SimplePriceChart prices={chartPrices} />
+            <SimplePriceChart
+              prices={chartPrices}
+              isLoading={!chartLoaded}
+              hasError={loadErrors.chart}
+            />
 
             <div className="mt-3 flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.12em] text-[#3D5A70]">
               <span>{chartWindow}</span>
@@ -283,20 +364,42 @@ const TokenDetails = () => {
             <p className="m-0 text-xs font-semibold uppercase tracking-[0.12em] text-[#3D5A70]">
               Balance
             </p>
-            <p className="mt-2 text-2xl font-black leading-none text-white">
-              {formatCurrency(usdBalance, true)}
-            </p>
+            {!userLoaded ? (
+              <SkeletonBlock className="mt-3 h-7 w-24" />
+            ) : loadErrors.user ? (
+              <UnavailableText className="mt-3">Unavailable</UnavailableText>
+            ) : (
+              <p className="mt-2 text-2xl font-black leading-none text-white">
+                {formatCurrency(usdBalance, true)}
+              </p>
+            )}
           </div>
           <div className="rounded-[18px] border border-[#C9A84C]/10 bg-[#C9A84C]/[0.03] p-4">
             <p className="m-0 text-xs font-semibold uppercase tracking-[0.12em] text-[#3D5A70]">
               Amount
             </p>
-            <p className="mt-2 truncate text-2xl font-black leading-none text-white">
-              {formatTokenAmount(tokenAmount, tokenId)}
-            </p>
-            <p className="mt-1 text-xs font-semibold text-[#8EB1CE]">
-              {tokenSymbols[tokenId]}
-            </p>
+            {!userLoaded || !marketLoaded ? (
+              <>
+                <SkeletonBlock className="mt-3 h-7 w-24" />
+                <SkeletonBlock className="mt-2 h-3 w-10" />
+              </>
+            ) : loadErrors.user || loadErrors.market ? (
+              <>
+                <UnavailableText className="mt-3">Unavailable</UnavailableText>
+                <p className="mt-1 text-xs font-semibold text-[#8EB1CE]">
+                  {tokenSymbols[tokenId]}
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="mt-2 truncate text-2xl font-black leading-none text-white">
+                  {formatTokenAmount(tokenAmount, tokenId)}
+                </p>
+                <p className="mt-1 text-xs font-semibold text-[#8EB1CE]">
+                  {tokenSymbols[tokenId]}
+                </p>
+              </>
+            )}
           </div>
         </section>
 
