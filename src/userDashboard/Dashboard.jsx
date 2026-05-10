@@ -306,10 +306,9 @@ const UserDashboard = () => {
 
           <div className="divide-y divide-[#C9A84C]/10">
             {sortedTokens.map(({ token, usdBalance, tokenAmount, price }) => (
-              <Link
+              <div
                 key={token}
-                to={`/token/${token}`}
-                className="flex items-center justify-between gap-3 py-4 text-inherit no-underline transition-colors hover:bg-[#C9A84C]/[0.03]"
+                className="flex items-center justify-between gap-3 py-4"
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-black ring-1 ring-[#C9A84C]/15">
@@ -350,7 +349,7 @@ const UserDashboard = () => {
                     />
                   )}
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         </section>
